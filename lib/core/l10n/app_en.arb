@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appTitle": "2048 Game",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
