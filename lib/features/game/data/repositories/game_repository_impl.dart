@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:_2048/features/game/data/datasources/local/database.dart';
+import 'package:_2048/features/game/data/datasources/local/database.dart' hide HighScore;
 import 'package:_2048/features/game/domain/entities/game_board.dart';
 import 'package:_2048/features/game/domain/entities/high_score.dart';
 import 'package:_2048/features/game/domain/repositories/game_repository.dart';
