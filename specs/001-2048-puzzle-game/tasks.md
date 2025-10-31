@@ -24,10 +24,10 @@
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
 
-- [ ] T005 Create project structure in `lib/` as per `plan.md`
-- [ ] T006 [P] Configure dependency injection in `lib/core/di/injection.dart`
-- [ ] T007 [P] Configure routing in `lib/core/routing/router.dart`
-- [ ] T008 [P] Configure localization in `lib/core/l10n/`
+- [x] T005 Create project structure in `lib/` as per `plan.md`
+- [x] T006 [P] Configure dependency injection in `lib/core/di/injection.dart`
+- [x] T007 [P] Configure routing in `lib/core/routing/router.dart`
+- [x] T008 [P] Configure localization in `lib/core/l10n/`
 
 ---
 
