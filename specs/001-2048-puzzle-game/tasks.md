@@ -13,10 +13,10 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create new Flutter project
-- [ ] T002 Add dependencies to `pubspec.yaml`: `flame`, `bloc`, `flutter_bloc`, `get_it`, `go_router`, `drift`, `path_provider`, `path`
-- [ ] T003 Add dev dependencies to `pubspec.yaml`: `build_runner`, `drift_dev`
-- [ ] T004 Run `flutter pub get`
+- [x] T001 Create new Flutter project
+- [x] T002 Add dependencies to `pubspec.yaml`: `flame`, `bloc`, `flutter_bloc`, `get_it`, `go_router`, `drift`, `path_provider`, `path`
+- [x] T003 Add dev dependencies to `pubspec.yaml`: `build_runner`, `drift_dev`
+- [x] T004 Run `flutter pub get`
 
 ---
 
