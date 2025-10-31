@@ -1,3 +1,4 @@
+import 'package:_2048/core/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:_2048/core/di/injection.dart';
@@ -17,12 +18,13 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: appProviders,
       child: MaterialApp.router(
-        title: '2048 Game',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
         routerConfig: appRouter,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
       ),
     );
   }
