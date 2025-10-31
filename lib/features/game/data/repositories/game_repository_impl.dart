@@ -18,21 +18,21 @@ class GameRepositoryImpl implements GameRepository {
   @override
   Future<GameBoard> move(GameBoard board, Direction direction) async {
     List<List<int>> newTiles = _copyTiles(board.tiles);
-    int newScore = board.score;
+    int currentScore = board.score;
     bool moved = false;
 
     switch (direction) {
       case Direction.up:
-        moved = _moveUp(newTiles, newScore);
+        (moved, currentScore) = _moveUp(newTiles, currentScore);
         break;
       case Direction.down:
-        moved = _moveDown(newTiles, newScore);
+        (moved, currentScore) = _moveDown(newTiles, currentScore);
         break;
       case Direction.left:
-        moved = _moveLeft(newTiles, newScore);
+        (moved, currentScore) = _moveLeft(newTiles, currentScore);
         break;
       case Direction.right:
-        moved = _moveRight(newTiles, newScore);
+        (moved, currentScore) = _moveRight(newTiles, currentScore);
         break;
     }
 
@@ -40,7 +40,7 @@ class GameRepositoryImpl implements GameRepository {
       _addRandomTile(newTiles);
     }
 
-    return GameBoard(tiles: newTiles, score: newScore);
+    return GameBoard(tiles: newTiles, score: currentScore);
   }
 
   List<List<int>> _copyTiles(List<List<int>> tiles) {
@@ -64,8 +64,9 @@ class GameRepositoryImpl implements GameRepository {
     }
   }
 
-  bool _moveUp(List<List<int>> tiles, int score) {
+  (bool, int) _moveUp(List<List<int>> tiles, int score) {
     bool moved = false;
+    int newScore = score;
     for (int col = 0; col < _boardSize; col++) {
       List<int> column = [];
       for (int row = 0; row < _boardSize; row++) {
@@ -74,7 +75,9 @@ class GameRepositoryImpl implements GameRepository {
         }
       }
 
-      List<int> newColumn = _mergeTiles(column, score);
+      final (mergedColumn, mergedScore) = _mergeTiles(column, newScore);
+      newScore = mergedScore;
+      List<int> newColumn = mergedColumn;
       while (newColumn.length < _boardSize) {
         newColumn.add(0);
       }
@@ -86,11 +89,12 @@ class GameRepositoryImpl implements GameRepository {
         tiles[row][col] = newColumn[row];
       }
     }
-    return moved;
+    return (moved, newScore);
   }
 
-  bool _moveDown(List<List<int>> tiles, int score) {
+  (bool, int) _moveDown(List<List<int>> tiles, int score) {
     bool moved = false;
+    int newScore = score;
     for (int col = 0; col < _boardSize; col++) {
       List<int> column = [];
       for (int row = _boardSize - 1; row >= 0; row--) {
@@ -99,7 +103,9 @@ class GameRepositoryImpl implements GameRepository {
         }
       }
 
-      List<int> newColumn = _mergeTiles(column, score);
+      final (mergedColumn, mergedScore) = _mergeTiles(column, newScore);
+      newScore = mergedScore;
+      List<int> newColumn = mergedColumn;
       while (newColumn.length < _boardSize) {
         newColumn.add(0);
       }
@@ -112,11 +118,12 @@ class GameRepositoryImpl implements GameRepository {
         tiles[row][col] = newColumn[row];
       }
     }
-    return moved;
+    return (moved, newScore);
   }
 
-  bool _moveLeft(List<List<int>> tiles, int score) {
+  (bool, int) _moveLeft(List<List<int>> tiles, int score) {
     bool moved = false;
+    int newScore = score;
     for (int row = 0; row < _boardSize; row++) {
       List<int> currentRow = [];
       for (int col = 0; col < _boardSize; col++) {
@@ -125,7 +132,9 @@ class GameRepositoryImpl implements GameRepository {
         }
       }
 
-      List<int> newRow = _mergeTiles(currentRow, score);
+      final (mergedRow, mergedScore) = _mergeTiles(currentRow, newScore);
+      newScore = mergedScore;
+      List<int> newRow = mergedRow;
       while (newRow.length < _boardSize) {
         newRow.add(0);
       }
@@ -137,11 +146,12 @@ class GameRepositoryImpl implements GameRepository {
         tiles[row][col] = newRow[col];
       }
     }
-    return moved;
+    return (moved, newScore);
   }
 
-  bool _moveRight(List<List<int>> tiles, int score) {
+  (bool, int) _moveRight(List<List<int>> tiles, int score) {
     bool moved = false;
+    int newScore = score;
     for (int row = 0; row < _boardSize; row++) {
       List<int> currentRow = [];
       for (int col = _boardSize - 1; col >= 0; col--) {
@@ -150,7 +160,9 @@ class GameRepositoryImpl implements GameRepository {
         }
       }
 
-      List<int> newRow = _mergeTiles(currentRow, score);
+      final (mergedRow, mergedScore) = _mergeTiles(currentRow, newScore);
+      newScore = mergedScore;
+      List<int> newRow = mergedRow;
       while (newRow.length < _boardSize) {
         newRow.add(0);
       }
@@ -163,21 +175,22 @@ class GameRepositoryImpl implements GameRepository {
         tiles[row][col] = newRow[col];
       }
     }
-    return moved;
+    return (moved, newScore);
   }
 
-  List<int> _mergeTiles(List<int> line, int score) {
+  (List<int>, int) _mergeTiles(List<int> line, int score) {
     List<int> newLine = [];
+    int newScore = score;
     for (int i = 0; i < line.length; i++) {
       if (i + 1 < line.length && line[i] == line[i + 1]) {
         int mergedValue = line[i] * 2;
         newLine.add(mergedValue);
-        score += mergedValue; // Update score here
+        newScore += mergedValue;
         i++;
       } else {
         newLine.add(line[i]);
       }
     }
-    return newLine;
+    return (newLine, newScore);
   }
 }
