@@ -9,38 +9,33 @@ class GameBoardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double spacing = 4.0;
     final double screenWidth = MediaQuery.of(context).size.width;
     final double boardSize = screenWidth - 32;
-    final double spacing = 4.0;
     final double tileSize = (boardSize - (spacing * 5)) / 4;
 
     List<Widget> tileWidgets = [];
-    for (int row = 0; row < 4; row++) {
-      for (int col = 0; col < 4; col++) {
-        final tileValue = gameBoard.tiles[row][col];
-        if (tileValue != 0) {
-          tileWidgets.add(
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 100),
-              curve: Curves.easeOut,
-              left: col * (tileSize + spacing),
-              top: row * (tileSize + spacing),
-              width: tileSize,
-              height: tileSize,
-              child: TileWidget(
-                key: ValueKey('$row-$col-$tileValue'),
-                value: tileValue,
-              ),
-            ),
-          );
-        }
+    for (final rowTiles in gameBoard.tiles) {
+      for (final tile in rowTiles) {
+        tileWidgets.add(
+          AnimatedPositioned(
+            key: ValueKey(tile.id),
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeOut,
+            left: tile.column * (tileSize + spacing),
+            top: tile.row * (tileSize + spacing),
+            width: tileSize,
+            height: tileSize,
+            child: TileWidget(value: tile.value),
+          ),
+        );
       }
     }
 
     return Container(
       width: boardSize,
       height: boardSize,
-      padding: EdgeInsets.all(spacing),
+      padding: const EdgeInsets.all(spacing),
       decoration: BoxDecoration(
         color: Colors.grey[400],
         borderRadius: BorderRadius.circular(8.0),
@@ -49,7 +44,7 @@ class GameBoardWidget extends StatelessWidget {
         children: [
           Positioned.fill(
             child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
                 crossAxisSpacing: spacing,
                 mainAxisSpacing: spacing,
