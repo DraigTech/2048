@@ -7,8 +7,11 @@ import 'dart:io';
 part 'database.g.dart';
 
 class HighScores extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  IntColumn get id => integer().withDefault(Constant(1))();
   IntColumn get score => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
 @DriftDatabase(tables: [HighScores])

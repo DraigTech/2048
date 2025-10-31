@@ -15,12 +15,9 @@ class $HighScoresTable extends HighScores
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    defaultValue: Constant(1),
   );
   static const VerificationMeta _scoreMeta = const VerificationMeta('score');
   @override

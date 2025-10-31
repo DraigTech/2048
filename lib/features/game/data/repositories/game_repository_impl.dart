@@ -51,14 +51,19 @@ class GameRepositoryImpl implements GameRepository {
 
   @override
   Future<HighScore> getHighScore() async {
-    final result = await _database.select(_database.highScores).getSingleOrNull();
-    return HighScore(score: result?.score ?? 0);
+    final results = await _database.select(_database.highScores).get();
+    if (results.isEmpty) {
+      return const HighScore(score: 0);
+    } else {
+      final maxScore = results.map((e) => e.score).reduce((a, b) => a > b ? a : b);
+      return HighScore(score: maxScore);
+    }
   }
 
   @override
   Future<void> saveHighScore(HighScore highScore) async {
     await _database.into(_database.highScores).insert(
-          HighScoresCompanion.insert(score: highScore.score),
+          HighScoresCompanion.insert(id: const drift.Value(1), score: highScore.score),
           mode: drift.InsertMode.insertOrReplace,
         );
   }
