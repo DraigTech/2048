@@ -1,11 +1,17 @@
 import 'dart:math';
 
+import 'package:_2048/features/game/data/datasources/local/database.dart' hide HighScore;
 import 'package:_2048/features/game/domain/entities/game_board.dart';
+import 'package:_2048/features/game/domain/entities/high_score.dart';
 import 'package:_2048/features/game/domain/repositories/game_repository.dart';
+import 'package:drift/drift.dart' as drift;
 
 class GameRepositoryImpl implements GameRepository {
   static const int _boardSize = 4;
   final Random _random = Random();
+  final AppDatabase _database;
+
+  GameRepositoryImpl(this._database);
 
   @override
   Future<GameBoard> newGame() async {
@@ -41,6 +47,20 @@ class GameRepositoryImpl implements GameRepository {
     }
 
     return GameBoard(tiles: newTiles, score: currentScore);
+  }
+
+  @override
+  Future<HighScore> getHighScore() async {
+    final result = await _database.select(_database.highScores).getSingleOrNull();
+    return HighScore(score: result?.score ?? 0);
+  }
+
+  @override
+  Future<void> saveHighScore(HighScore highScore) async {
+    await _database.into(_database.highScores).insert(
+          HighScoresCompanion.insert(score: highScore.score),
+          mode: drift.InsertMode.insertOrReplace,
+        );
   }
 
   List<List<int>> _copyTiles(List<List<int>> tiles) {

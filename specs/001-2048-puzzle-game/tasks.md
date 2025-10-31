@@ -58,13 +58,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Define `HighScore` entity in `lib/features/game/domain/entities/`
-- [ ] T018 [US2] Update `GameRepository` with `getHighScore` and `saveHighScore` methods in `lib/features/game/domain/repositories/game_repository.dart`
-- [ ] T019 [US2] Implement `GetHighScoreUseCase` and `SaveHighScoreUseCase` in `lib/features/game/domain/usecases/`
-- [ ] T020 [US2] Define `HighScore` table in `lib/features/game/data/datasources/local/database.dart`
-- [ ] T021 [US2] Implement high score logic in `GameRepositoryImpl` in `lib/features/game/data/repositories/game_repository_impl.dart`
-- [ ] T022 [US2] Update `GameBloc` to handle high score state in `lib/features/game/presentation/bloc/game_bloc.dart`
-- [ ] T023 [US2] Display the high score in `GameScreen` in `lib/features/game/presentation/screens/game_screen.dart`
+- [x] T017 [US2] Define `HighScore` entity in `lib/features/game/domain/entities/`
+- [x] T018 [US2] Update `GameRepository` with `getHighScore` and `saveHighScore` methods in `lib/features/game/domain/repositories/game_repository.dart`
+- [x] T019 [US2] Implement `GetHighScoreUseCase` and `SaveHighScoreUseCase` in `lib/features/game/domain/usecases/`
+- [x] T020 [US2] Define `HighScore` table in `lib/features/game/data/datasources/local/database.dart`
+- [x] T021 [US2] Implement high score logic in `GameRepositoryImpl` in `lib/features/game/data/repositories/game_repository_impl.dart`
+- [x] T022 [US2] Update `GameBloc` to handle high score state in `lib/features/game/presentation/bloc/game_bloc.dart`
+- [x] T023 [US2] Display the high score in `GameScreen` in `lib/features/game/presentation/screens/game_screen.dart`
 
 ---
 
