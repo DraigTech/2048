@@ -39,14 +39,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Define `GameBoard` and `Tile` entities in `lib/features/game/domain/entities/`
-- [ ] T010 [US1] Define `GameRepository` interface in `lib/features/game/domain/repositories/game_repository.dart`
-- [ ] T011 [US1] Implement `MoveTilesUseCase` in `lib/features/game/domain/usecases/move_tiles.dart`
-- [ ] T012 [US1] Implement `GameBloc` in `lib/features/game/presentation/bloc/game_bloc.dart`
-- [ ] T013 [US1] Create `GameBoardWidget` in `lib/features/game/presentation/widgets/game_board_widget.dart`
-- [ ] T014 [US1] Create `TileWidget` in `lib/features/game/presentation/widgets/tile_widget.dart`
-- [ ] T015 [US1] Create `GameScreen` in `lib/features/game/presentation/screens/game_screen.dart`
-- [ ] T016 [US1] Implement `GameRepositoryImpl` in `lib/features/game/data/repositories/game_repository_impl.dart`
+- [x] T009 [US1] Define `GameBoard` and `Tile` entities in `lib/features/game/domain/entities/`
+- [x] T010 [US1] Define `GameRepository` interface in `lib/features/game/domain/repositories/game_repository.dart`
+- [x] T011 [US1] Implement `MoveTilesUseCase` in `lib/features/game/domain/usecases/move_tiles.dart`
+- [x] T012 [US1] Implement `GameBloc` in `lib/features/game/presentation/bloc/game_bloc.dart`
+- [x] T013 [US1] Create `GameBoardWidget` in `lib/features/game/presentation/widgets/game_board_widget.dart`
+- [x] T014 [US1] Create `TileWidget` in `lib/features/game/presentation/widgets/tile_widget.dart`
+- [x] T015 [US1] Create `GameScreen` in `lib/features/game/presentation/screens/game_screen.dart`
+- [x] T016 [US1] Implement `GameRepositoryImpl` in `lib/features/game/data/repositories/game_repository_impl.dart`
 
 ---
 
