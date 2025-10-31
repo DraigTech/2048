@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:_2048/features/game/domain/entities/game_board.dart';
+import 'package:_2048/features/game/presentation/widgets/tile_widget.dart';
 
 class GameBoardWidget extends StatelessWidget {
   final GameBoard gameBoard;
@@ -8,35 +9,65 @@ class GameBoardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        crossAxisSpacing: 4.0,
-        mainAxisSpacing: 4.0,
-      ),
-      itemCount: 16,
-      itemBuilder: (context, index) {
-        final row = index ~/ 4;
-        final col = index % 4;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double boardSize = screenWidth - 32;
+    final double spacing = 4.0;
+    final double tileSize = (boardSize - (spacing * 5)) / 4;
+
+    List<Widget> tileWidgets = [];
+    for (int row = 0; row < 4; row++) {
+      for (int col = 0; col < 4; col++) {
         final tileValue = gameBoard.tiles[row][col];
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: Center(
-            child: Text(
-              tileValue == 0 ? '' : tileValue.toString(),
-              style: const TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
+        if (tileValue != 0) {
+          tileWidgets.add(
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 100),
+              curve: Curves.easeOut,
+              left: col * (tileSize + spacing),
+              top: row * (tileSize + spacing),
+              width: tileSize,
+              height: tileSize,
+              child: TileWidget(
+                key: ValueKey('$row-$col-$tileValue'),
+                value: tileValue,
               ),
             ),
+          );
+        }
+      }
+    }
+
+    return Container(
+      width: boardSize,
+      height: boardSize,
+      padding: EdgeInsets.all(spacing),
+      decoration: BoxDecoration(
+        color: Colors.grey[400],
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+              ),
+              itemCount: 16,
+              itemBuilder: (context, index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                );
+              },
+            ),
           ),
-        );
-      },
+          ...tileWidgets,
+        ],
+      ),
     );
   }
 }
