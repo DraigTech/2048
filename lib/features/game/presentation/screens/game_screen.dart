@@ -21,7 +21,8 @@ class GameScreen extends StatelessWidget {
           } else if (state is GameLoaded) {
             return Column(
               children: [
-                Text('Score: ${state.gameBoard.score}'), // Assuming GameBoard has a score
+                Text('Score: ${state.gameBoard.score}'),
+                Text('High Score: ${state.highScore}'),
                 Expanded(
                   child: Center(
                     child: GameBoardWidget(gameBoard: state.gameBoard),
