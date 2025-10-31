@@ -1,4 +1,5 @@
 import 'package:_2048/core/l10n/app_localizations.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:_2048/core/di/injection.dart';
@@ -6,7 +7,9 @@ import 'package:_2048/core/di/providers.dart';
 import 'package:_2048/core/routing/router.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
+  FlameAudio.bgm.initialize();
   runApp(const MyApp());
 }
 
