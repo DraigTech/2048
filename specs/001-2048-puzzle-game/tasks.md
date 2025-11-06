@@ -74,7 +74,7 @@
 
 - [x] T024 [P] Add animations for tile movements and merges
 - [x] T025 [P] Add sound effects for moves and merges
-- [ ] T026 [P] Implement responsive UI for different screen sizes
+- [x] T026 [P] Implement responsive UI for different screen sizes
 - [ ] T027 [P] Add unit tests for BLoCs and UseCases
 
 ---

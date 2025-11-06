@@ -4,15 +4,20 @@ import 'package:_2048/features/game/presentation/widgets/tile_widget.dart';
 
 class GameBoardWidget extends StatelessWidget {
   final GameBoard gameBoard;
+  final double gameBoardSize;
 
-  const GameBoardWidget({super.key, required this.gameBoard});
+  const GameBoardWidget({
+    super.key,
+    required this.gameBoard,
+    required this.gameBoardSize,
+  });
 
   @override
   Widget build(BuildContext context) {
-    const double spacing = 4.0;
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double boardSize = screenWidth - 32;
-    final double tileSize = (boardSize - (spacing * 5)) / 4;
+    const double spacing = 4;
+    const double gridSize = 4;
+    final double tileSize =
+        (gameBoardSize - spacing * (gridSize + 1)) / gridSize;
 
     List<Widget> tileWidgets = [];
     for (final rowTiles in gameBoard.tiles) {
@@ -33,8 +38,8 @@ class GameBoardWidget extends StatelessWidget {
     }
 
     return Container(
-      width: boardSize,
-      height: boardSize,
+      width: gameBoardSize,
+      height: gameBoardSize,
       padding: const EdgeInsets.all(spacing),
       decoration: BoxDecoration(
         color: Colors.grey[400],
@@ -44,6 +49,8 @@ class GameBoardWidget extends StatelessWidget {
         children: [
           Positioned.fill(
             child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
                 crossAxisSpacing: spacing,
