@@ -9,4 +9,8 @@ class GameBoard extends Equatable {
 
   @override
   List<Object?> get props => [tiles, score];
+
+  GameBoard copyWith({List<List<Tile>>? tiles, int? score}) {
+    return GameBoard(tiles: tiles ?? this.tiles, score: score ?? this.score);
+  }
 }
