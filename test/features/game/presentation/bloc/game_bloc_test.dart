@@ -133,7 +133,7 @@ void main() {
         ).thenAnswer((_) async => HighScore(score: 0));
         return gameBloc;
       },
-      act: (bloc) => bloc.add(GameStarted()),
+      act: (bloc) => bloc.add(GameStartEvent()),
       expect: () => [GameLoaded(tInitialGameBoard, highScore: 0)],
     );
 
@@ -148,7 +148,7 @@ void main() {
         ).thenAnswer((_) async => HighScore(score: 100));
         return gameBloc;
       },
-      act: (bloc) => bloc.add(GameStarted()),
+      act: (bloc) => bloc.add(GameStartEvent()),
       expect: () => [GameLoaded(tInitialGameBoard, highScore: 100)],
     );
 
@@ -161,7 +161,7 @@ void main() {
         gameBloc.emit(GameLoaded(tInitialGameBoard, highScore: 0));
         return gameBloc;
       },
-      act: (bloc) => bloc.add(GameMoved(Direction.up)),
+      act: (bloc) => bloc.add(GameMoveEvent(MoveDirection.up)),
       expect: () => [GameLoaded(tMovedGameBoard, highScore: 0)],
     );
 
@@ -174,7 +174,7 @@ void main() {
         gameBloc.emit(GameLoaded(tInitialGameBoard, highScore: 0));
         return gameBloc;
       },
-      act: (bloc) => bloc.add(GameMoved(Direction.up)),
+      act: (bloc) => bloc.add(GameMoveEvent(MoveDirection.up)),
       expect: () => [GameLoaded(tMovedGameBoard, highScore: 0)],
     );
 
@@ -189,7 +189,7 @@ void main() {
         gameBloc.emit(GameLoaded(tInitialGameBoard, highScore: 100));
         return gameBloc;
       },
-      act: (bloc) => bloc.add(GameMoved(Direction.up)),
+      act: (bloc) => bloc.add(GameMoveEvent(MoveDirection.up)),
       expect: () => [
         GameLoaded(tMovedGameBoard.copyWith(score: 200), highScore: 200),
       ],

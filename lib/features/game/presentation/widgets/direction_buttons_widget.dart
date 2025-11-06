@@ -10,9 +10,9 @@ class DirectionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: Direction.values.map((direction) {
+      children: MoveDirection.values.map((direction) {
         return ElevatedButton(
-          onPressed: () => context.read<GameBloc>().add(GameMoved(direction)),
+          onPressed: () => context.read<GameBloc>().add(GameMoveEvent(direction)),
           child: Text(direction.name),
         );
       }).toList(),
