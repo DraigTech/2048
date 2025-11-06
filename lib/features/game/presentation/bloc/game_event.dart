@@ -7,12 +7,12 @@ abstract class GameEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GameStarted extends GameEvent {}
+class GameStartEvent extends GameEvent {}
 
-class GameMoved extends GameEvent {
-  final Direction direction;
+class GameMoveEvent extends GameEvent {
+  final MoveDirection direction;
 
-  const GameMoved(this.direction);
+  const GameMoveEvent(this.direction);
 
   @override
   List<Object> get props => [direction];

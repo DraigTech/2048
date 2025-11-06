@@ -27,23 +27,23 @@ class GameRepositoryImpl implements GameRepository {
   }
 
   @override
-  Future<(GameBoard, bool)> move(GameBoard board, Direction direction) async {
+  Future<(GameBoard, bool)> move(GameBoard board, MoveDirection direction) async {
     List<List<Tile?>> newTiles = _copyTiles(board.tiles);
     int currentScore = board.score;
     bool moved = false;
     bool merged = false;
 
     switch (direction) {
-      case Direction.up:
+      case MoveDirection.up:
         (moved, currentScore, merged) = _moveUp(newTiles, currentScore);
         break;
-      case Direction.down:
+      case MoveDirection.down:
         (moved, currentScore, merged) = _moveDown(newTiles, currentScore);
         break;
-      case Direction.left:
+      case MoveDirection.left:
         (moved, currentScore, merged) = _moveLeft(newTiles, currentScore);
         break;
-      case Direction.right:
+      case MoveDirection.right:
         (moved, currentScore, merged) = _moveRight(newTiles, currentScore);
         break;
     }

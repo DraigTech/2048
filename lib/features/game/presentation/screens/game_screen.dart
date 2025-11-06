@@ -1,10 +1,10 @@
 import 'package:_2048/core/l10n/app_localizations.dart';
-import 'package:_2048/features/game/presentation/widgets/direction_buttons_widget.dart';
 import 'package:_2048/features/game/presentation/widgets/score_display_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:_2048/features/game/presentation/bloc/game_bloc.dart';
 import 'package:_2048/features/game/presentation/widgets/game_board_widget.dart';
+import 'package:_2048/features/game/presentation/widgets/input_handler.dart';
 
 class GameScreen extends StatelessWidget {
   const GameScreen({super.key});
@@ -19,7 +19,7 @@ class GameScreen extends StatelessWidget {
         builder: (context, state) {
           switch (state) {
             case GameInitial():
-              context.read<GameBloc>().add(GameStarted());
+              context.read<GameBloc>().add(GameStartEvent());
               return const Center(child: CircularProgressIndicator());
             case GameLoaded():
               return GameContent(state: state);
@@ -54,23 +54,15 @@ class GameContent extends StatelessWidget {
             children: [
               Expanded(
                 child: Center(
-                  child: GameBoardWidget(
-                    gameBoard: state.gameBoard,
-                    gameBoardSize: gameBoardSize,
+                  child: InputHandler(
+                    child: GameBoardWidget(
+                      gameBoard: state.gameBoard,
+                      gameBoardSize: gameBoardSize,
+                    ),
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    ScoreDisplay(),
-                    SizedBox(height: 20),
-                    DirectionButtons(),
-                  ],
-                ),
-              ),
+              const ScoreDisplay(),
             ],
           );
         } else {
@@ -80,15 +72,13 @@ class GameContent extends StatelessWidget {
               const ScoreDisplay(),
               Expanded(
                 child: Center(
-                  child: GameBoardWidget(
-                    gameBoard: state.gameBoard,
-                    gameBoardSize: gameBoardSize,
+                  child: InputHandler(
+                    child: GameBoardWidget(
+                      gameBoard: state.gameBoard,
+                      gameBoardSize: gameBoardSize,
+                    ),
                   ),
                 ),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: DirectionButtons(),
               ),
             ],
           );

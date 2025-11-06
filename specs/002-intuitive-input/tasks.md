@@ -21,7 +21,7 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create the file `lib/features/game/presentation/widgets/input_handler.dart`.
+- [X] T001 Create the file `lib/features/game/presentation/widgets/input_handler.dart`.
 
 ---
 
@@ -29,14 +29,14 @@
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
 
-- [ ] T002 [US1] Implement `GestureDetector` in `lib/features/game/presentation/widgets/input_handler.dart` to detect swipe gestures.
-- [ ] T003 [US1] In `input_handler.dart`, map swipe gestures to a new `GameMoveEvent` and dispatch it to the `GameBloc`.
-- [ ] T004 [US2] Implement `RawKeyboardListener` in `lib/features/game/presentation/widgets/input_handler.dart` to listen for keyboard events.
-- [ ] T005 [US2] In `input_handler.dart`, map arrow and WASD key presses to the `GameMoveEvent` and dispatch it to the `GameBloc`.
-- [ ] T006 Update `lib/features/game/presentation/bloc/game_event.dart` to include a `GameMoveEvent` that takes a `MoveDirection` enum.
-- [ ] T007 Update `lib/features/game/presentation/bloc/game_bloc.dart` to handle the `GameMoveEvent` and trigger the appropriate game logic.
-- [ ] T008 In the widget that builds the game board, remove the on-screen button controls.
-- [ ] T009 Wrap the `GameBoard` widget with the `InputHandler` widget in the main game screen.
+- [X] T002 [US1] Implement `GestureDetector` in `lib/features/game/presentation/widgets/input_handler.dart` to detect swipe gestures.
+- [X] T003 [US1] In `input_handler.dart`, map swipe gestures to a new `GameMoveEvent` and dispatch it to the `GameBloc`.
+- [X] T004 [US2] Implement `KeyboardListener` in `lib/features/game/presentation/widgets/input_handler.dart` to listen for keyboard events.
+- [X] T005 [US2] In `input_handler.dart`, map arrow and WASD key presses to the `GameMoveEvent` and dispatch it to the `GameBloc`.
+- [X] T006 Update `lib/features/game/presentation/bloc/game_event.dart` to include a `GameMoveEvent` that takes a `MoveDirection` enum.
+- [X] T007 Update `lib/features/game/presentation/bloc/game_bloc.dart` to handle the `GameMoveEvent` and trigger the appropriate game logic.
+- [X] T008 In the widget that builds the game board, remove the on-screen button controls.
+- [X] T009 Wrap the `GameBoard` widget with the `InputHandler` widget in the main game screen.
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -50,7 +50,7 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Verify that swipe gestures (up, down, left, right) correctly move the tiles on a mobile device or emulator.
+- [X] T010 [US1] Verify that swipe gestures (up, down, left, right) correctly move the tiles on a mobile device or emulator.
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -64,7 +64,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] Verify that arrow keys and WASD keys correctly move the tiles on a desktop or web build.
+- [X] T011 [US2] Verify that arrow keys and WASD keys correctly move the tiles on a desktop or web build.
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 

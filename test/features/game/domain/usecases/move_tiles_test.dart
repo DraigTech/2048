@@ -35,14 +35,14 @@ void main() {
 
     test('should call repository.move with correct parameters', () async {
       // Arrange
-      when(mockGameRepository.move(tGameBoard, Direction.down)).thenAnswer((_) async => (tMovedGameBoard, false));
+      when(mockGameRepository.move(tGameBoard, MoveDirection.down)).thenAnswer((_) async => (tMovedGameBoard, false));
 
       // Act
-      final result = await moveTilesUseCase.call(tGameBoard, Direction.down);
+      final result = await moveTilesUseCase.call(tGameBoard, MoveDirection.down);
 
       // Assert
       expect(result, (tMovedGameBoard, false));
-      verify(mockGameRepository.move(tGameBoard, Direction.down)).called(1);
+      verify(mockGameRepository.move(tGameBoard, MoveDirection.down)).called(1);
       verifyNoMoreInteractions(mockGameRepository);
     });
   });

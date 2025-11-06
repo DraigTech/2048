@@ -24,15 +24,15 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     required this.getHighScore,
     required this.saveHighScore,
   }) : super(GameInitial()) {
-    on<GameStarted>(_onGameStarted);
-    on<GameMoved>(_onGameMoved);
+    on<GameStartEvent>(_onGameStarted);
+    on<GameMoveEvent>(_onGameMoved);
   }
 
   AudioPool? moveAudio;
   AudioPool? mergeAudio;
 
   Future<void> _onGameStarted(
-    GameStarted event,
+    GameStartEvent event,
     Emitter<GameState> emit,
   ) async {
     moveAudio = await FlameAudio.createPool(Assets.audio.move, maxPlayers: 2);
@@ -42,7 +42,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     emit(GameLoaded(newBoard, highScore: currentHighScore.score));
   }
 
-  Future<void> _onGameMoved(GameMoved event, Emitter<GameState> emit) async {
+  Future<void> _onGameMoved(GameMoveEvent event, Emitter<GameState> emit) async {
     if (state is GameLoaded) {
       final currentBoard = (state as GameLoaded).gameBoard;
       final currentHighScore = (state as GameLoaded).highScore;
