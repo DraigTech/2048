@@ -1,0 +1,33 @@
+{
+  "@@locale": "en",
+  "appTitle": "2048",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "scoreLabel": "Score: {score}",
+  "@scoreLabel": {
+    "description": "Label for current score",
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "highScoreLabel": "High Score: {highScore}",
+  "@highScoreLabel": {
+    "description": "Label for high score",
+    "placeholders": {
+      "highScore": {
+        "type": "int"
+      }
+    }
+  },
+  "gameOver": "Game Over!",
+  "@gameOver": {
+    "description": "Message when game is over"
+  },
+  "unknownState": "Unknown State",
+  "@unknownState": {
+    "description": "Message for unknown game state"
+  }
+}
