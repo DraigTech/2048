@@ -6,7 +6,7 @@ class MoveTilesUseCase {
 
   MoveTilesUseCase(this.repository);
 
-  Future<(GameBoard, bool)> call(GameBoard board, Direction direction) {
+  Future<(GameBoard, bool)> call(GameBoard board, MoveDirection direction) {
     return repository.move(board, direction);
   }
 }

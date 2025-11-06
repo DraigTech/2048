@@ -56,7 +56,7 @@ class MockGameRepository extends _i1.Mock implements _i4.GameRepository {
   @override
   _i5.Future<(_i2.GameBoard, bool)> move(
     _i2.GameBoard? board,
-    _i4.Direction? direction,
+    _i4.MoveDirection? direction,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#move, [board, direction]),
