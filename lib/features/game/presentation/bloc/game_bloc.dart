@@ -28,14 +28,15 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<GameMoved>(_onGameMoved);
   }
 
+  AudioPool? moveAudio;
+  AudioPool? mergeAudio;
+
   Future<void> _onGameStarted(
     GameStarted event,
     Emitter<GameState> emit,
   ) async {
-    FlameAudio.audioCache.loadAll([
-      Assets.audio.move.split('/').last,
-      Assets.audio.merge.split('/').last,
-    ]);
+    moveAudio = await FlameAudio.createPool(Assets.audio.move, maxPlayers: 2);
+    mergeAudio = await FlameAudio.createPool(Assets.audio.merge, maxPlayers: 2);
     final newBoard = await repository.newGame();
     final currentHighScore = await getHighScore();
     emit(GameLoaded(newBoard, highScore: currentHighScore.score));
@@ -49,9 +50,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       if (newBoard != currentBoard) {
         if (merged) {
-          FlameAudio.play(Assets.audio.merge.split('/').last);
+          mergeAudio?.start();
         }
-        FlameAudio.play(Assets.audio.move.split('/').last);
+        moveAudio?.start();
       }
 
       int updatedHighScore = currentHighScore;

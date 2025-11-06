@@ -21,8 +21,9 @@ Future<void> main() async {
   configureDependencies();
 
   /// Initialize FlameAudio
-  FlameAudio.bgm.initialize();
+  FlameAudio.updatePrefix("");
 
+  /// Run app
   runApp(const MyApp());
 }
 
