@@ -47,3 +47,6 @@ app.*.map.json
 # Localization
 lib/core/l10n/app_localizations.dart
 lib/core/l10n/app_localizations_en.dart
+
+# Test cache
+test/cache
