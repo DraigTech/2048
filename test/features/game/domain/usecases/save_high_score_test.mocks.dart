@@ -71,6 +71,14 @@ class MockGameRepository extends _i1.Mock implements _i4.GameRepository {
           as _i5.Future<(_i2.GameBoard, bool)>);
 
   @override
+  _i5.Future<bool> isGameOver(_i2.GameBoard? board) =>
+      (super.noSuchMethod(
+            Invocation.method(#isGameOver, [board]),
+            returnValue: _i5.Future<bool>.value(false),
+          )
+          as _i5.Future<bool>);
+
+  @override
   _i5.Future<_i3.HighScore> getHighScore() =>
       (super.noSuchMethod(
             Invocation.method(#getHighScore, []),

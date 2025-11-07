@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -7,6 +8,7 @@ import 'package:_2048/features/game/domain/entities/game_board.dart';
 import 'package:_2048/features/game/domain/entities/high_score.dart';
 import 'package:_2048/features/game/domain/entities/tile.dart';
 import 'package:_2048/features/game/domain/repositories/game_repository.dart';
+import 'package:_2048/features/game/domain/usecases/check_game_over.dart';
 import 'package:_2048/features/game/domain/usecases/get_high_score.dart';
 import 'package:_2048/features/game/domain/usecases/move_tiles.dart';
 import 'package:_2048/features/game/domain/usecases/save_high_score.dart';
@@ -19,6 +21,7 @@ import 'game_bloc_test.mocks.dart';
   MoveTilesUseCase,
   GetHighScoreUseCase,
   SaveHighScoreUseCase,
+  CheckGameOverUseCase,
 ])
 void main() {
   late GameBloc gameBloc;
@@ -26,6 +29,7 @@ void main() {
   late MockMoveTilesUseCase mockMoveTilesUseCase;
   late MockGetHighScoreUseCase mockGetHighScoreUseCase;
   late MockSaveHighScoreUseCase mockSaveHighScoreUseCase;
+  late MockCheckGameOverUseCase mockCheckGameOverUseCase;
 
   // Mock the audioplayers and path_provider channels
   const MethodChannel audioPlayerChannel = MethodChannel(
@@ -40,6 +44,8 @@ void main() {
 
   setUp(() {
     TestWidgetsFlutterBinding.ensureInitialized();
+
+    FlameAudio.audioCache.prefix = '';
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(audioPlayerChannel, (
@@ -81,12 +87,14 @@ void main() {
     mockMoveTilesUseCase = MockMoveTilesUseCase();
     mockGetHighScoreUseCase = MockGetHighScoreUseCase();
     mockSaveHighScoreUseCase = MockSaveHighScoreUseCase();
+    mockCheckGameOverUseCase = MockCheckGameOverUseCase();
 
     gameBloc = GameBloc(
       repository: mockGameRepository,
       moveTiles: mockMoveTilesUseCase,
       getHighScore: mockGetHighScoreUseCase,
       saveHighScore: mockSaveHighScoreUseCase,
+      checkGameOver: mockCheckGameOverUseCase,
     );
   });
 
@@ -158,6 +166,7 @@ void main() {
         when(
           mockMoveTilesUseCase.call(any, any),
         ).thenAnswer((_) async => (tMovedGameBoard, false));
+        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
         gameBloc.emit(GameLoaded(tInitialGameBoard, highScore: 0));
         return gameBloc;
       },
@@ -171,6 +180,7 @@ void main() {
         when(
           mockMoveTilesUseCase.call(any, any),
         ).thenAnswer((_) async => (tMovedGameBoard, true));
+        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
         gameBloc.emit(GameLoaded(tInitialGameBoard, highScore: 0));
         return gameBloc;
       },
@@ -186,6 +196,7 @@ void main() {
           mockMoveTilesUseCase.call(any, any),
         ).thenAnswer((_) async => (gameBoardWithHighScore, false));
         when(mockSaveHighScoreUseCase.call(any)).thenAnswer((_) async => {});
+        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
         gameBloc.emit(GameLoaded(tInitialGameBoard, highScore: 100));
         return gameBloc;
       },

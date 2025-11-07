@@ -56,6 +56,37 @@ class GameRepositoryImpl implements GameRepository {
   }
 
   @override
+  Future<bool> isGameOver(GameBoard board) async {
+    final tiles = _copyTiles(board.tiles);
+
+    // Check for empty cells
+    for (int r = 0; r < _boardSize; r++) {
+      for (int c = 0; c < _boardSize; c++) {
+        if (tiles[r][c] == null) {
+          return false;
+        }
+      }
+    }
+
+    // Check for possible merges
+    for (int r = 0; r < _boardSize; r++) {
+      for (int c = 0; c < _boardSize; c++) {
+        final tile = tiles[r][c]!;
+        // Check right
+        if (c + 1 < _boardSize && tile.value == tiles[r][c + 1]?.value) {
+          return false;
+        }
+        // Check down
+        if (r + 1 < _boardSize && tile.value == tiles[r + 1][c]?.value) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  @override
   Future<HighScore> getHighScore() async {
     final results = await _database.select(_database.highScores).get();
     if (results.isEmpty) {

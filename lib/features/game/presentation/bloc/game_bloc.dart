@@ -4,6 +4,7 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:_2048/features/game/domain/entities/game_board.dart';
 import 'package:_2048/features/game/domain/entities/high_score.dart';
 import 'package:_2048/features/game/domain/repositories/game_repository.dart';
+import 'package:_2048/features/game/domain/usecases/check_game_over.dart';
 import 'package:_2048/features/game/domain/usecases/get_high_score.dart';
 import 'package:_2048/features/game/domain/usecases/move_tiles.dart';
 import 'package:_2048/features/game/domain/usecases/save_high_score.dart';
@@ -17,15 +18,19 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   final GameRepository repository;
   final GetHighScoreUseCase getHighScore;
   final SaveHighScoreUseCase saveHighScore;
+  final CheckGameOverUseCase checkGameOver;
 
   GameBloc({
     required this.moveTiles,
     required this.repository,
     required this.getHighScore,
     required this.saveHighScore,
+    required this.checkGameOver,
   }) : super(GameInitial()) {
     on<GameStartEvent>(_onGameStarted);
     on<GameMoveEvent>(_onGameMoved);
+    on<CheckGameOverEvent>(_onCheckGameOver);
+    on<NewGameEvent>(_onNewGame);
   }
 
   AudioPool? moveAudio;
@@ -35,17 +40,19 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     GameStartEvent event,
     Emitter<GameState> emit,
   ) async {
-    moveAudio = await FlameAudio.createPool(Assets.audio.move, maxPlayers: 2);
-    mergeAudio = await FlameAudio.createPool(Assets.audio.merge, maxPlayers: 2);
-    final newBoard = await repository.newGame();
-    final currentHighScore = await getHighScore();
-    emit(GameLoaded(newBoard, highScore: currentHighScore.score));
+    add(NewGameEvent());
+    moveAudio = await FlameAudio.createPool(Assets.audio.move, maxPlayers: 1);
+    mergeAudio = await FlameAudio.createPool(Assets.audio.merge, maxPlayers: 1);
   }
 
-  Future<void> _onGameMoved(GameMoveEvent event, Emitter<GameState> emit) async {
+  Future<void> _onGameMoved(
+    GameMoveEvent event,
+    Emitter<GameState> emit,
+  ) async {
     if (state is GameLoaded) {
-      final currentBoard = (state as GameLoaded).gameBoard;
-      final currentHighScore = (state as GameLoaded).highScore;
+      final currentState = state as GameLoaded;
+      final currentBoard = currentState.gameBoard;
+      final currentHighScore = currentState.highScore;
       final (newBoard, merged) = await moveTiles(currentBoard, event.direction);
 
       if (newBoard != currentBoard) {
@@ -61,9 +68,33 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         await saveHighScore(HighScore(score: updatedHighScore));
       }
 
-      // TODO: Check for game over condition
-
       emit(GameLoaded(newBoard, highScore: updatedHighScore));
+      add(CheckGameOverEvent());
     }
+  }
+
+  Future<void> _onCheckGameOver(
+    CheckGameOverEvent event,
+    Emitter<GameState> emit,
+  ) async {
+    if (state is GameLoaded) {
+      final currentState = state as GameLoaded;
+      final isGameOver = await checkGameOver(currentState.gameBoard);
+      if (isGameOver) {
+        emit(
+          GameLoaded(
+            currentState.gameBoard,
+            highScore: currentState.highScore,
+            isGameOver: true,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _onNewGame(NewGameEvent event, Emitter<GameState> emit) async {
+    final newBoard = await repository.newGame();
+    final currentHighScore = await getHighScore();
+    emit(GameLoaded(newBoard, highScore: currentHighScore.score));
   }
 }

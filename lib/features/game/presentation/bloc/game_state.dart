@@ -12,11 +12,10 @@ class GameInitial extends GameState {}
 class GameLoaded extends GameState {
   final GameBoard gameBoard;
   final int highScore;
+  final bool isGameOver;
 
-  const GameLoaded(this.gameBoard, {required this.highScore});
+  const GameLoaded(this.gameBoard, {required this.highScore, this.isGameOver = false});
 
   @override
-  List<Object> get props => [gameBoard, highScore];
+  List<Object> get props => [gameBoard, highScore, isGameOver];
 }
-
-class GameOver extends GameState {}
