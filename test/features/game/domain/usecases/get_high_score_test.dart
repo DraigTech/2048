@@ -1,10 +1,9 @@
-
+import 'package:draig_2048/features/game/domain/entities/high_score.dart';
+import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
+import 'package:draig_2048/features/game/domain/usecases/get_high_score.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:_2048/features/game/domain/entities/high_score.dart';
-import 'package:_2048/features/game/domain/repositories/game_repository.dart';
-import 'package:_2048/features/game/domain/usecases/get_high_score.dart';
 
 import 'get_high_score_test.mocks.dart';
 
@@ -19,11 +18,13 @@ void main() {
   });
 
   group('GetHighScoreUseCase', () {
-    final tHighScore = HighScore(score: 100);
+    const tHighScore = HighScore(score: 100);
 
     test('should get high score from the repository', () async {
       // Arrange
-      when(mockGameRepository.getHighScore()).thenAnswer((_) async => tHighScore);
+      when(
+        mockGameRepository.getHighScore(),
+      ).thenAnswer((_) async => tHighScore);
 
       // Act
       final result = await getHighScoreUseCase.call();

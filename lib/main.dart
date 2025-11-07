@@ -1,12 +1,16 @@
-import 'package:_2048/core/l10n/app_localizations.dart';
+import 'package:draig_2048/core/di/injection.dart';
+import 'package:draig_2048/core/di/providers.dart';
+import 'package:draig_2048/core/l10n/app_localizations.dart';
+import 'package:draig_2048/core/routing/router.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:_2048/core/di/injection.dart';
-import 'package:_2048/core/di/providers.dart';
-import 'package:_2048/core/routing/router.dart';
 
+/// Main entry point of the application.
+///
+/// This function initializes Flutter bindings, sets preferred orientations,
+/// configures dependency injection, initializes audio, and runs the app.
 Future<void> main() async {
   /// Ensure the Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,13 +25,15 @@ Future<void> main() async {
   configureDependencies();
 
   /// Initialize FlameAudio
-  FlameAudio.updatePrefix("");
+  FlameAudio.updatePrefix('');
 
   /// Run app
   runApp(const MyApp());
 }
 
+/// The root widget of the application.
 class MyApp extends StatelessWidget {
+  /// Creates a [MyApp] instance.
   const MyApp({super.key});
 
   @override

@@ -1,4 +1,4 @@
-package com.example.u_2048
+package com.draig_2048
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine

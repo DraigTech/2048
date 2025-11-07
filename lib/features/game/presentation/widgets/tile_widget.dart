@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// A widget that displays a single tile on the game board.
 class TileWidget extends StatelessWidget {
+  /// Creates a [TileWidget] instance.
+  const TileWidget({required this.value, super.key});
+
+  /// The numerical value displayed on the tile.
   final int value;
 
-  const TileWidget({super.key, required this.value});
-
+  /// Returns the background color for a tile based on its [value].
   Color _getTileColor(int value) {
     switch (value) {
       case 0:
@@ -39,7 +43,7 @@ class TileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
+      tween: Tween(begin: 0, end: 1),
       duration: const Duration(milliseconds: 150),
       builder: (context, scale, child) {
         return Transform.scale(
@@ -47,13 +51,13 @@ class TileWidget extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               color: _getTileColor(value),
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Center(
               child: Text(
                 value == 0 ? '' : value.toString(),
                 style: TextStyle(
-                  fontSize: 24.0,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: value < 8 ? Colors.black : Colors.white,
                 ),

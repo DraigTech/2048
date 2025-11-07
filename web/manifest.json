@@ -1,6 +1,6 @@
 {
-    "name": "_2048",
-    "short_name": "_2048",
+    "name": "draig_2048",
+    "short_name": "draig_2048",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
