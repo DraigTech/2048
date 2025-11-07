@@ -17,3 +17,7 @@ class GameMoveEvent extends GameEvent {
   @override
   List<Object> get props => [direction];
 }
+
+class CheckGameOverEvent extends GameEvent {}
+
+class NewGameEvent extends GameEvent {}

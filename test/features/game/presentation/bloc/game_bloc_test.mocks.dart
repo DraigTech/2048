@@ -9,6 +9,8 @@ import 'package:_2048/features/game/domain/entities/game_board.dart' as _i2;
 import 'package:_2048/features/game/domain/entities/high_score.dart' as _i3;
 import 'package:_2048/features/game/domain/repositories/game_repository.dart'
     as _i4;
+import 'package:_2048/features/game/domain/usecases/check_game_over.dart'
+    as _i9;
 import 'package:_2048/features/game/domain/usecases/get_high_score.dart' as _i7;
 import 'package:_2048/features/game/domain/usecases/move_tiles.dart' as _i6;
 import 'package:_2048/features/game/domain/usecases/save_high_score.dart'
@@ -79,6 +81,14 @@ class MockGameRepository extends _i1.Mock implements _i4.GameRepository {
             )),
           )
           as _i5.Future<(_i2.GameBoard, bool)>);
+
+  @override
+  _i5.Future<bool> isGameOver(_i2.GameBoard? board) =>
+      (super.noSuchMethod(
+            Invocation.method(#isGameOver, [board]),
+            returnValue: _i5.Future<bool>.value(false),
+          )
+          as _i5.Future<bool>);
 
   @override
   _i5.Future<_i3.HighScore> getHighScore() =>
@@ -196,4 +206,33 @@ class MockSaveHighScoreUseCase extends _i1.Mock
             returnValueForMissingStub: _i5.Future<void>.value(),
           )
           as _i5.Future<void>);
+}
+
+/// A class which mocks [CheckGameOverUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockCheckGameOverUseCase extends _i1.Mock
+    implements _i9.CheckGameOverUseCase {
+  MockCheckGameOverUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.GameRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeGameRepository_2(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i4.GameRepository);
+
+  @override
+  _i5.Future<bool> call(_i2.GameBoard? board) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [board]),
+            returnValue: _i5.Future<bool>.value(false),
+          )
+          as _i5.Future<bool>);
 }

@@ -1,56 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:_2048/features/game/presentation/bloc/game_bloc.dart';
-import 'package:_2048/features/game/domain/repositories/game_repository.dart';
 
 class InputHandler extends StatelessWidget {
   final Widget child;
+  final FocusNode focusNode;
+  final Function moveUp;
+  final Function moveDown;
+  final Function moveLeft;
+  final Function moveRight;
 
-  const InputHandler({super.key, required this.child});
+  const InputHandler({
+    super.key,
+    required this.child,
+    required this.focusNode,
+    required this.moveUp,
+    required this.moveDown,
+    required this.moveLeft,
+    required this.moveRight,
+  });
 
   @override
   Widget build(BuildContext context) {
     return KeyboardListener(
-      focusNode: FocusNode(),
+      focusNode: focusNode,
       autofocus: true,
       onKeyEvent: (event) {
         final physicalKey = event.physicalKey;
         if (physicalKey == PhysicalKeyboardKey.arrowUp ||
             physicalKey == PhysicalKeyboardKey.keyW) {
-          context.read<GameBloc>().add(const GameMoveEvent(MoveDirection.up));
+          moveUp();
         } else if (physicalKey == PhysicalKeyboardKey.arrowDown ||
             physicalKey == PhysicalKeyboardKey.keyS) {
-          context.read<GameBloc>().add(const GameMoveEvent(MoveDirection.down));
+          moveDown();
         } else if (physicalKey == PhysicalKeyboardKey.arrowLeft ||
             physicalKey == PhysicalKeyboardKey.keyA) {
-          context.read<GameBloc>().add(const GameMoveEvent(MoveDirection.left));
+          moveLeft();
         } else if (physicalKey == PhysicalKeyboardKey.arrowRight ||
             physicalKey == PhysicalKeyboardKey.keyD) {
-          context.read<GameBloc>().add(
-            const GameMoveEvent(MoveDirection.right),
-          );
+          moveRight();
         }
       },
       child: GestureDetector(
         onVerticalDragEnd: (details) {
           if (details.primaryVelocity! < 0) {
-            context.read<GameBloc>().add(const GameMoveEvent(MoveDirection.up));
+            moveUp();
           } else if (details.primaryVelocity! > 0) {
-            context.read<GameBloc>().add(
-              const GameMoveEvent(MoveDirection.down),
-            );
+            moveDown();
           }
         },
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity! < 0) {
-            context.read<GameBloc>().add(
-              const GameMoveEvent(MoveDirection.left),
-            );
+            moveLeft();
           } else if (details.primaryVelocity! > 0) {
-            context.read<GameBloc>().add(
-              const GameMoveEvent(MoveDirection.right),
-            );
+            moveRight();
           }
         },
         child: child,

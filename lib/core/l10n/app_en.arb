@@ -26,6 +26,10 @@
   "@gameOver": {
     "description": "Message when game is over"
   },
+  "playAgain": "Play Again",
+  "@playAgain": {
+    "description": "Button text to start a new game"
+  },
   "unknownState": "Unknown State",
   "@unknownState": {
     "description": "Message for unknown game state"

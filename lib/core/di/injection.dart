@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:_2048/features/game/data/datasources/local/database.dart';
 import 'package:_2048/features/game/data/repositories/game_repository_impl.dart';
 import 'package:_2048/features/game/domain/repositories/game_repository.dart';
+import 'package:_2048/features/game/domain/usecases/check_game_over.dart';
 import 'package:_2048/features/game/domain/usecases/get_high_score.dart';
 import 'package:_2048/features/game/domain/usecases/move_tiles.dart';
 import 'package:_2048/features/game/domain/usecases/save_high_score.dart';
@@ -20,6 +21,7 @@ void configureDependencies() {
   getIt.registerLazySingleton(() => MoveTilesUseCase(getIt()));
   getIt.registerLazySingleton(() => GetHighScoreUseCase(getIt()));
   getIt.registerLazySingleton(() => SaveHighScoreUseCase(getIt()));
+  getIt.registerLazySingleton(() => CheckGameOverUseCase(getIt()));
 
   // Register BLoCs
   getIt.registerFactory(() => GameBloc(
@@ -27,5 +29,6 @@ void configureDependencies() {
         repository: getIt(),
         getHighScore: getIt(),
         saveHighScore: getIt(),
+        checkGameOver: getIt(),
       ));
 }
