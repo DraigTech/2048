@@ -1,18 +1,18 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:draig_2048/features/game/domain/entities/game_board.dart';
+import 'package:draig_2048/features/game/domain/entities/high_score.dart';
+import 'package:draig_2048/features/game/domain/entities/tile.dart';
+import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
+import 'package:draig_2048/features/game/domain/usecases/check_game_over.dart';
+import 'package:draig_2048/features/game/domain/usecases/get_high_score.dart';
+import 'package:draig_2048/features/game/domain/usecases/move_tiles.dart';
+import 'package:draig_2048/features/game/domain/usecases/save_high_score.dart';
+import 'package:draig_2048/features/game/presentation/bloc/game_bloc.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
-import 'package:_2048/features/game/domain/entities/game_board.dart';
-import 'package:_2048/features/game/domain/entities/high_score.dart';
-import 'package:_2048/features/game/domain/entities/tile.dart';
-import 'package:_2048/features/game/domain/repositories/game_repository.dart';
-import 'package:_2048/features/game/domain/usecases/check_game_over.dart';
-import 'package:_2048/features/game/domain/usecases/get_high_score.dart';
-import 'package:_2048/features/game/domain/usecases/move_tiles.dart';
-import 'package:_2048/features/game/domain/usecases/save_high_score.dart';
-import 'package:_2048/features/game/presentation/bloc/game_bloc.dart';
 
 import 'game_bloc_test.mocks.dart';
 
@@ -32,13 +32,13 @@ void main() {
   late MockCheckGameOverUseCase mockCheckGameOverUseCase;
 
   // Mock the audioplayers and path_provider channels
-  const MethodChannel audioPlayerChannel = MethodChannel(
+  const audioPlayerChannel = MethodChannel(
     'xyz.luan/audioplayers',
   );
-  const MethodChannel audioPlayerGlobalChannel = MethodChannel(
+  const audioPlayerGlobalChannel = MethodChannel(
     'xyz.luan/audioplayers.global',
   );
-  const MethodChannel pathProviderChannel = MethodChannel(
+  const pathProviderChannel = MethodChannel(
     'plugins.flutter.io/path_provider',
   );
 
@@ -98,18 +98,18 @@ void main() {
     );
   });
 
-  tearDown(() {
+  tearDown(() async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(audioPlayerChannel, null);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(audioPlayerGlobalChannel, null);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(pathProviderChannel, null);
-    gameBloc.close();
+    await gameBloc.close();
   });
 
   group('GameBloc', () {
-    final tInitialGameBoard = GameBoard(
+    const tInitialGameBoard = GameBoard(
       tiles: [
         [?null, ?null, ?null, ?null],
         [?null, ?null, ?null, ?null],
@@ -117,7 +117,7 @@ void main() {
         [?null, ?null, ?null, ?null],
       ],
     );
-    final tMovedGameBoard = GameBoard(
+    const tMovedGameBoard = GameBoard(
       tiles: [
         [Tile(id: '1', value: 2, row: 0, column: 0), ?null, ?null, ?null],
         [?null, ?null, ?null, ?null],
@@ -131,33 +131,35 @@ void main() {
     });
 
     blocTest<GameBloc, GameState>(
-      'emits [GameLoaded] with initial game board and high score 0 when GameStarted and no high score',
+      'emits [GameLoaded] with initial game board and high score 0 when '
+      'GameStarted and no high score',
       build: () {
         when(
           mockGameRepository.newGame(),
         ).thenAnswer((_) async => tInitialGameBoard);
         when(
           mockGetHighScoreUseCase.call(),
-        ).thenAnswer((_) async => HighScore(score: 0));
+        ).thenAnswer((_) async => const HighScore(score: 0));
         return gameBloc;
       },
       act: (bloc) => bloc.add(GameStartEvent()),
-      expect: () => [GameLoaded(tInitialGameBoard, highScore: 0)],
+      expect: () => [const GameLoaded(tInitialGameBoard, highScore: 0)],
     );
 
     blocTest<GameBloc, GameState>(
-      'emits [GameLoaded] with initial game board and existing high score when GameStarted',
+      'emits [GameLoaded] with initial game board and '
+      'existing high score when GameStarted',
       build: () {
         when(
           mockGameRepository.newGame(),
         ).thenAnswer((_) async => tInitialGameBoard);
         when(
           mockGetHighScoreUseCase.call(),
-        ).thenAnswer((_) async => HighScore(score: 100));
+        ).thenAnswer((_) async => const HighScore(score: 100));
         return gameBloc;
       },
       act: (bloc) => bloc.add(GameStartEvent()),
-      expect: () => [GameLoaded(tInitialGameBoard, highScore: 100)],
+      expect: () => [const GameLoaded(tInitialGameBoard, highScore: 100)],
     );
 
     blocTest<GameBloc, GameState>(
@@ -167,29 +169,31 @@ void main() {
           mockMoveTilesUseCase.call(any, any),
         ).thenAnswer((_) async => (tMovedGameBoard, false));
         when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
-        gameBloc.emit(GameLoaded(tInitialGameBoard, highScore: 0));
+        gameBloc.emit(const GameLoaded(tInitialGameBoard, highScore: 0));
         return gameBloc;
       },
-      act: (bloc) => bloc.add(GameMoveEvent(MoveDirection.up)),
-      expect: () => [GameLoaded(tMovedGameBoard, highScore: 0)],
+      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
+      expect: () => [const GameLoaded(tMovedGameBoard, highScore: 0)],
     );
 
     blocTest<GameBloc, GameState>(
-      'emits [GameLoaded] with updated game board when GameMoved and merge occurs',
+      'emits [GameLoaded] with updated game board when GameMoved '
+      'and merge occurs',
       build: () {
         when(
           mockMoveTilesUseCase.call(any, any),
         ).thenAnswer((_) async => (tMovedGameBoard, true));
         when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
-        gameBloc.emit(GameLoaded(tInitialGameBoard, highScore: 0));
+        gameBloc.emit(const GameLoaded(tInitialGameBoard, highScore: 0));
         return gameBloc;
       },
-      act: (bloc) => bloc.add(GameMoveEvent(MoveDirection.up)),
-      expect: () => [GameLoaded(tMovedGameBoard, highScore: 0)],
+      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
+      expect: () => [const GameLoaded(tMovedGameBoard, highScore: 0)],
     );
 
     blocTest<GameBloc, GameState>(
-      'emits [GameLoaded] with updated high score when current score exceeds high score',
+      'emits [GameLoaded] with updated high score when '
+      'current score exceeds high score',
       build: () {
         final gameBoardWithHighScore = tMovedGameBoard.copyWith(score: 200);
         when(
@@ -197,15 +201,17 @@ void main() {
         ).thenAnswer((_) async => (gameBoardWithHighScore, false));
         when(mockSaveHighScoreUseCase.call(any)).thenAnswer((_) async => {});
         when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
-        gameBloc.emit(GameLoaded(tInitialGameBoard, highScore: 100));
+        gameBloc.emit(const GameLoaded(tInitialGameBoard, highScore: 100));
         return gameBloc;
       },
-      act: (bloc) => bloc.add(GameMoveEvent(MoveDirection.up)),
+      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
       expect: () => [
         GameLoaded(tMovedGameBoard.copyWith(score: 200), highScore: 200),
       ],
       verify: (_) {
-        verify(mockSaveHighScoreUseCase.call(HighScore(score: 200))).called(1);
+        verify(
+          mockSaveHighScoreUseCase.call(const HighScore(score: 200)),
+        ).called(1);
       },
     );
   });

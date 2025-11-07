@@ -1,12 +1,19 @@
-import 'package:_2048/core/l10n/app_localizations.dart';
-import 'package:_2048/features/game/domain/repositories/game_repository.dart';
+import 'dart:async';
+
+import 'package:draig_2048/core/l10n/app_localizations.dart';
+import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
+import 'package:draig_2048/features/game/presentation/bloc/game_bloc.dart';
+import 'package:draig_2048/features/game/presentation/widgets/game_board_widget.dart';
+import 'package:draig_2048/features/game/presentation/widgets/input_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:_2048/features/game/presentation/bloc/game_bloc.dart';
-import 'package:_2048/features/game/presentation/widgets/game_board_widget.dart';
-import 'package:_2048/features/game/presentation/widgets/input_handler.dart';
 
+/// The main screen for the 2048 game.
+///
+/// This widget is responsible for building the game UI, handling game events,
+/// and displaying game-related information such as score and game over status.
 class GameScreen extends StatelessWidget {
+  /// Creates a [GameScreen] instance.
   const GameScreen({super.key});
 
   @override
@@ -19,25 +26,27 @@ class GameScreen extends StatelessWidget {
         if (state is GameLoaded && state.isGameOver) {
           gameBoardFocus.unfocus();
 
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(l10n.gameOver),
-                content: Text(l10n.scoreLabel(state.gameBoard.score)),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text(l10n.playAgain),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      context.read<GameBloc>().add(NewGameEvent());
-                      gameBoardFocus.requestFocus();
-                    },
-                  ),
-                ],
-              );
-            },
+          unawaited(
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text(l10n.gameOver),
+                  content: Text(l10n.scoreLabel(state.gameBoard.score)),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text(l10n.playAgain),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        context.read<GameBloc>().add(NewGameEvent());
+                        gameBoardFocus.requestFocus();
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
           );
         }
       },
@@ -67,20 +76,31 @@ class GameScreen extends StatelessWidget {
   }
 }
 
+/// A widget that displays the game content, including the game board and score.
 class GameContent extends StatelessWidget {
+  /// Creates a [GameContent] instance.
   const GameContent({
-    super.key,
     required this.state,
     required this.gameBoardFocus,
     required this.appTitle,
     required this.scoreLabel,
     required this.highScoreLabel,
+    super.key,
   });
 
+  /// The current game state.
   final GameLoaded state;
+
+  /// The focus node for the game board, used for handling keyboard input.
   final FocusNode gameBoardFocus;
+
+  /// The title of the application.
   final String appTitle;
+
+  /// The label displaying the current score.
   final String scoreLabel;
+
+  /// The label displaying the high score.
   final String highScoreLabel;
 
   @override
@@ -95,30 +115,34 @@ class GameContent extends StatelessWidget {
         if (isWide) {
           // Wide layout
           return Row(
-            children: [gameBoard(context, gameBoardSize), scoreDisplay()],
+            children: [_gameBoard(context, gameBoardSize), _scoreDisplay()],
           );
         } else {
           // Narrow layout
           return Column(
-            children: [scoreDisplay(), gameBoard(context, gameBoardSize)],
+            children: [_scoreDisplay(), _gameBoard(context, gameBoardSize)],
           );
         }
       },
     );
   }
 
-  Widget gameBoard(BuildContext context, double gameBoardSize) => Expanded(
+  /// Builds the game board widget.
+  Widget _gameBoard(BuildContext context, double gameBoardSize) => Expanded(
     child: Center(
       child: InputHandler(
         focusNode: gameBoardFocus,
         moveUp: () =>
-            context.read<GameBloc>().add(GameMoveEvent(MoveDirection.up)),
-        moveDown: () =>
-            context.read<GameBloc>().add(GameMoveEvent(MoveDirection.down)),
-        moveLeft: () =>
-            context.read<GameBloc>().add(GameMoveEvent(MoveDirection.left)),
-        moveRight: () =>
-            context.read<GameBloc>().add(GameMoveEvent(MoveDirection.right)),
+            context.read<GameBloc>().add(const GameMoveEvent(MoveDirection.up)),
+        moveDown: () => context.read<GameBloc>().add(
+          const GameMoveEvent(MoveDirection.down),
+        ),
+        moveLeft: () => context.read<GameBloc>().add(
+          const GameMoveEvent(MoveDirection.left),
+        ),
+        moveRight: () => context.read<GameBloc>().add(
+          const GameMoveEvent(MoveDirection.right),
+        ),
         child: GameBoardWidget(
           gameBoard: state.gameBoard,
           gameBoardSize: gameBoardSize,
@@ -127,11 +151,12 @@ class GameContent extends StatelessWidget {
     ),
   );
 
-  Widget scoreDisplay() => Column(
+  /// Builds the score display widget.
+  Widget _scoreDisplay() => Column(
     children: [
       Text(
         appTitle,
-        style: const TextStyle(fontSize: 48.0, fontWeight: FontWeight.bold),
+        style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
       ),
       Text(scoreLabel),
       Text(highScoreLabel),

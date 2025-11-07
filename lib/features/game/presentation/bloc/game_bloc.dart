@@ -1,25 +1,28 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
+import 'package:draig_2048/features/game/domain/entities/game_board.dart';
+import 'package:draig_2048/features/game/domain/entities/high_score.dart';
+import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
+import 'package:draig_2048/features/game/domain/usecases/check_game_over.dart';
+import 'package:draig_2048/features/game/domain/usecases/get_high_score.dart';
+import 'package:draig_2048/features/game/domain/usecases/move_tiles.dart';
+import 'package:draig_2048/features/game/domain/usecases/save_high_score.dart';
+import 'package:draig_2048/generated/assets.gen.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:_2048/features/game/domain/entities/game_board.dart';
-import 'package:_2048/features/game/domain/entities/high_score.dart';
-import 'package:_2048/features/game/domain/repositories/game_repository.dart';
-import 'package:_2048/features/game/domain/usecases/check_game_over.dart';
-import 'package:_2048/features/game/domain/usecases/get_high_score.dart';
-import 'package:_2048/features/game/domain/usecases/move_tiles.dart';
-import 'package:_2048/features/game/domain/usecases/save_high_score.dart';
-import 'package:_2048/generated/assets.gen.dart';
 
 part 'game_event.dart';
 part 'game_state.dart';
 
+/// BLoC responsible for managing the game state of 2048.
+///
+/// It handles game events suchs as starting a new game, moving tiles,
+/// and checking for game over conditions.
 class GameBloc extends Bloc<GameEvent, GameState> {
-  final MoveTilesUseCase moveTiles;
-  final GameRepository repository;
-  final GetHighScoreUseCase getHighScore;
-  final SaveHighScoreUseCase saveHighScore;
-  final CheckGameOverUseCase checkGameOver;
-
+  /// Creates a [GameBloc] instance.
+  ///
+  /// Requires various use cases and a [GameRepository] for its operations.
   GameBloc({
     required this.moveTiles,
     required this.repository,
@@ -33,18 +36,41 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<NewGameEvent>(_onNewGame);
   }
 
-  AudioPool? moveAudio;
-  AudioPool? mergeAudio;
+  /// Use case for moving tiles on the game board.
+  final MoveTilesUseCase moveTiles;
 
+  /// Repository for game-related data operations.
+  final GameRepository repository;
+
+  /// Use case for retrieving the high score.
+  final GetHighScoreUseCase getHighScore;
+
+  /// Use case for saving the high score.
+  final SaveHighScoreUseCase saveHighScore;
+
+  /// Use case for checking if the game is over.
+  final CheckGameOverUseCase checkGameOver;
+
+  AudioPool? _moveAudio;
+  AudioPool? _mergeAudio;
+
+  /// Handles the [GameStartEvent] to initialize the game and load audio assets.
   Future<void> _onGameStarted(
     GameStartEvent event,
     Emitter<GameState> emit,
   ) async {
     add(NewGameEvent());
-    moveAudio = await FlameAudio.createPool(Assets.audio.move, maxPlayers: 1);
-    mergeAudio = await FlameAudio.createPool(Assets.audio.merge, maxPlayers: 1);
+    _moveAudio = await FlameAudio.createPool(Assets.audio.move, maxPlayers: 1);
+    _mergeAudio = await FlameAudio.createPool(
+      Assets.audio.merge,
+      maxPlayers: 1,
+    );
   }
 
+  /// Handles the [GameMoveEvent] to process tile movements.
+  ///
+  /// It updates the game board, checks for merges, plays audio,
+  /// updates the high score if necessary, and then checks for game over.
   Future<void> _onGameMoved(
     GameMoveEvent event,
     Emitter<GameState> emit,
@@ -57,12 +83,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       if (newBoard != currentBoard) {
         if (merged) {
-          mergeAudio?.start();
+          unawaited(_mergeAudio?.start());
         }
-        moveAudio?.start();
+        unawaited(_moveAudio?.start());
       }
 
-      int updatedHighScore = currentHighScore;
+      var updatedHighScore = currentHighScore;
       if (newBoard.score > currentHighScore) {
         updatedHighScore = newBoard.score;
         await saveHighScore(HighScore(score: updatedHighScore));
@@ -73,6 +99,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     }
   }
 
+  /// Handles the [CheckGameOverEvent] to determine if the game has ended.
+  ///
+  /// If the game is over, it updates the state to reflect this.
   Future<void> _onCheckGameOver(
     CheckGameOverEvent event,
     Emitter<GameState> emit,
@@ -92,6 +121,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     }
   }
 
+  /// Handles the [NewGameEvent] to start a fresh game.
+  ///
+  /// It creates a new game board and loads the current high score.
   Future<void> _onNewGame(NewGameEvent event, Emitter<GameState> emit) async {
     final newBoard = await repository.newGame();
     final currentHighScore = await getHighScore();

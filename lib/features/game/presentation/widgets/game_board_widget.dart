@@ -1,25 +1,29 @@
+import 'package:draig_2048/features/game/domain/entities/game_board.dart';
+import 'package:draig_2048/features/game/presentation/widgets/tile_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:_2048/features/game/domain/entities/game_board.dart';
-import 'package:_2048/features/game/presentation/widgets/tile_widget.dart';
 
+/// A widget that displays the 2048 game board.
 class GameBoardWidget extends StatelessWidget {
-  final GameBoard gameBoard;
-  final double gameBoardSize;
-
+  /// Creates a [GameBoardWidget] instance.
   const GameBoardWidget({
-    super.key,
     required this.gameBoard,
     required this.gameBoardSize,
+    super.key,
   });
+
+  /// The current state of the game board.
+  final GameBoard gameBoard;
+
+  /// The size (width and height) of the game board.
+  final double gameBoardSize;
 
   @override
   Widget build(BuildContext context) {
     const double spacing = 4;
     const double gridSize = 4;
-    final double tileSize =
-        (gameBoardSize - spacing * (gridSize + 1)) / gridSize;
+    final tileSize = (gameBoardSize - spacing * (gridSize + 1)) / gridSize;
 
-    List<Widget> tileWidgets = [];
+    final tileWidgets = <Widget>[];
     for (final rowTiles in gameBoard.tiles) {
       for (final tile in rowTiles) {
         tileWidgets.add(
@@ -43,7 +47,7 @@ class GameBoardWidget extends StatelessWidget {
       padding: const EdgeInsets.all(spacing),
       decoration: BoxDecoration(
         color: Colors.grey[400],
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Stack(
         children: [
@@ -61,7 +65,7 @@ class GameBoardWidget extends StatelessWidget {
                 return Container(
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 );
               },
