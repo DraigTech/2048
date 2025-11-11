@@ -17,11 +17,14 @@ final GetIt getIt = GetIt.instance;
 /// various services, repositories, use cases, and BLoCs.
 void configureDependencies() {
   // Register database
-  getIt..registerSingleton<AppDatabase>(AppDatabase())
+  getIt
+    ..registerSingleton<AppDatabase>(AppDatabase())
+    ..registerSingleton<GameStateDao>(getIt<AppDatabase>().gameStateDao)
+    ..registerSingleton<HighScoreDao>(getIt<AppDatabase>().highScoreDao)
 
   // Register repositories
   ..registerLazySingleton<GameRepository>(
-    () => GameRepositoryImpl(getIt()),
+    () => GameRepositoryImpl(getIt(), getIt()),
   )
 
   // Register use cases

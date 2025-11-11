@@ -17,16 +17,16 @@ import 'package:mockito/mockito.dart';
 import 'game_bloc_test.mocks.dart';
 
 @GenerateMocks([
-  GameRepository,
   MoveTilesUseCase,
+  GameRepository,
   GetHighScoreUseCase,
   SaveHighScoreUseCase,
   CheckGameOverUseCase,
 ])
 void main() {
   late GameBloc gameBloc;
-  late MockGameRepository mockGameRepository;
   late MockMoveTilesUseCase mockMoveTilesUseCase;
+  late MockGameRepository mockGameRepository;
   late MockGetHighScoreUseCase mockGetHighScoreUseCase;
   late MockSaveHighScoreUseCase mockSaveHighScoreUseCase;
   late MockCheckGameOverUseCase mockCheckGameOverUseCase;
@@ -83,15 +83,15 @@ void main() {
           return null;
         });
 
-    mockGameRepository = MockGameRepository();
     mockMoveTilesUseCase = MockMoveTilesUseCase();
+    mockGameRepository = MockGameRepository();
     mockGetHighScoreUseCase = MockGetHighScoreUseCase();
     mockSaveHighScoreUseCase = MockSaveHighScoreUseCase();
     mockCheckGameOverUseCase = MockCheckGameOverUseCase();
 
     gameBloc = GameBloc(
-      repository: mockGameRepository,
       moveTiles: mockMoveTilesUseCase,
+      repository: mockGameRepository,
       getHighScore: mockGetHighScoreUseCase,
       saveHighScore: mockSaveHighScoreUseCase,
       checkGameOver: mockCheckGameOverUseCase,
@@ -109,109 +109,201 @@ void main() {
   });
 
   group('GameBloc', () {
-    const tInitialGameBoard = GameBoard(
+    const tInitialBoard = GameBoard(
       tiles: [
-        [?null, ?null, ?null, ?null],
-        [?null, ?null, ?null, ?null],
-        [?null, ?null, ?null, ?null],
-        [?null, ?null, ?null, ?null],
+        [Tile(id: '1', value: 2, row: 0, column: 0)],
       ],
     );
-    const tMovedGameBoard = GameBoard(
+    const tMovedBoard = GameBoard(
+      score: 2,
       tiles: [
-        [Tile(id: '1', value: 2, row: 0, column: 0), ?null, ?null, ?null],
-        [?null, ?null, ?null, ?null],
-        [?null, ?null, ?null, ?null],
-        [?null, ?null, ?null, ?null],
+        [Tile(id: '1', value: 2, row: 1, column: 0)],
       ],
     );
-
-    test('initial state is GameInitial', () {
-      expect(gameBloc.state, GameInitial());
-    });
+    const tHighScore = HighScore(score: 0);
 
     blocTest<GameBloc, GameState>(
-      'emits [GameLoaded] with initial game board and high score 0 when '
-      'GameStarted and no high score',
+      'should emit GameLoaded with initial game board and high score 0 '
+      'when GameStartEvent and no saved board',
       build: () {
+        when(mockGameRepository.loadBoard()).thenAnswer((_) async => null);
         when(
           mockGameRepository.newGame(),
-        ).thenAnswer((_) async => tInitialGameBoard);
+        ).thenAnswer((_) async => tInitialBoard);
         when(
           mockGetHighScoreUseCase.call(),
-        ).thenAnswer((_) async => const HighScore(score: 0));
+        ).thenAnswer((_) async => tHighScore);
         return gameBloc;
       },
       act: (bloc) => bloc.add(GameStartEvent()),
-      expect: () => [const GameLoaded(tInitialGameBoard, highScore: 0)],
-    );
-
-    blocTest<GameBloc, GameState>(
-      'emits [GameLoaded] with initial game board and '
-      'existing high score when GameStarted',
-      build: () {
-        when(
-          mockGameRepository.newGame(),
-        ).thenAnswer((_) async => tInitialGameBoard);
-        when(
-          mockGetHighScoreUseCase.call(),
-        ).thenAnswer((_) async => const HighScore(score: 100));
-        return gameBloc;
-      },
-      act: (bloc) => bloc.add(GameStartEvent()),
-      expect: () => [const GameLoaded(tInitialGameBoard, highScore: 100)],
-    );
-
-    blocTest<GameBloc, GameState>(
-      'emits [GameLoaded] with updated game board when GameMoved and no merge',
-      build: () {
-        when(
-          mockMoveTilesUseCase.call(any, any),
-        ).thenAnswer((_) async => (tMovedGameBoard, false));
-        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
-        gameBloc.emit(const GameLoaded(tInitialGameBoard, highScore: 0));
-        return gameBloc;
-      },
-      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
-      expect: () => [const GameLoaded(tMovedGameBoard, highScore: 0)],
-    );
-
-    blocTest<GameBloc, GameState>(
-      'emits [GameLoaded] with updated game board when GameMoved '
-      'and merge occurs',
-      build: () {
-        when(
-          mockMoveTilesUseCase.call(any, any),
-        ).thenAnswer((_) async => (tMovedGameBoard, true));
-        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
-        gameBloc.emit(const GameLoaded(tInitialGameBoard, highScore: 0));
-        return gameBloc;
-      },
-      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
-      expect: () => [const GameLoaded(tMovedGameBoard, highScore: 0)],
-    );
-
-    blocTest<GameBloc, GameState>(
-      'emits [GameLoaded] with updated high score when '
-      'current score exceeds high score',
-      build: () {
-        final gameBoardWithHighScore = tMovedGameBoard.copyWith(score: 200);
-        when(
-          mockMoveTilesUseCase.call(any, any),
-        ).thenAnswer((_) async => (gameBoardWithHighScore, false));
-        when(mockSaveHighScoreUseCase.call(any)).thenAnswer((_) async => {});
-        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
-        gameBloc.emit(const GameLoaded(tInitialGameBoard, highScore: 100));
-        return gameBloc;
-      },
-      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
       expect: () => [
-        GameLoaded(tMovedGameBoard.copyWith(score: 200), highScore: 200),
+        GameLoaded(tInitialBoard, highScore: tHighScore.score),
       ],
       verify: (_) {
+        verify(mockGameRepository.loadBoard()).called(1);
+        verify(mockGameRepository.newGame()).called(1);
+        verify(mockGetHighScoreUseCase.call()).called(1);
+      },
+    );
+
+    blocTest<GameBloc, GameState>(
+      'should emit GameLoaded with loaded board and high score when '
+      'GameStartEvent and saved board exists',
+      build: () {
+        when(
+          mockGameRepository.loadBoard(),
+        ).thenAnswer((_) async => tInitialBoard);
+        when(
+          mockGetHighScoreUseCase.call(),
+        ).thenAnswer((_) async => tHighScore);
+        return gameBloc;
+      },
+      act: (bloc) => bloc.add(GameStartEvent()),
+      expect: () => [
+        GameLoaded(tInitialBoard, highScore: tHighScore.score),
+      ],
+      verify: (_) {
+        verify(mockGameRepository.loadBoard()).called(1);
+        verify(mockGetHighScoreUseCase.call()).called(1);
+        verifyNever(mockGameRepository.newGame());
+      },
+    );
+
+    blocTest<GameBloc, GameState>(
+      'should emit GameLoaded with updated board and score on GameMoveEvent',
+      build: () {
+        when(
+          mockMoveTilesUseCase.call(any, any),
+        ).thenAnswer((_) async => (tMovedBoard, false));
+        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
+        return gameBloc;
+      },
+      seed: () => GameLoaded(tInitialBoard, highScore: tHighScore.score),
+      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
+      expect: () => [
+        GameLoaded(tMovedBoard, highScore: tMovedBoard.score),
+      ],
+      verify: (_) {
+        verify(mockMoveTilesUseCase.call(any, any)).called(1);
+        verify(mockCheckGameOverUseCase.call(any)).called(1);
+        verifyNever(mockGameRepository.saveBoard(any));
+      },
+    );
+
+    blocTest<GameBloc, GameState>(
+      'should emit GameLoaded with isGameOver true if game is over after move',
+      build: () {
+        when(
+          mockMoveTilesUseCase.call(any, any),
+        ).thenAnswer((_) async => (tMovedBoard, false));
+        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => true);
+        return gameBloc;
+      },
+      seed: () => GameLoaded(tInitialBoard, highScore: tHighScore.score),
+      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
+      expect: () => [
+        GameLoaded(tMovedBoard, highScore: tMovedBoard.score),
+        GameLoaded(
+          tMovedBoard,
+          highScore:  tMovedBoard.score,
+          isGameOver: true,
+        ),
+      ],
+      verify: (_) {
+        verify(mockMoveTilesUseCase.call(any, any)).called(1);
+        verify(mockCheckGameOverUseCase.call(any)).called(1);
+        verifyNever(mockGameRepository.saveBoard(any));
+      },
+    );
+
+    blocTest<GameBloc, GameState>(
+      'should save new high score if current score is greater',
+      build: () {
+        when(
+          mockMoveTilesUseCase.call(any, any),
+        ).thenAnswer((_) async => (tInitialBoard.copyWith(score: 200), true));
+        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
+        when(mockSaveHighScoreUseCase.call(any)).thenAnswer((_) async => {});
+        return gameBloc;
+      },
+      seed: () => const GameLoaded(tInitialBoard, highScore: 100),
+      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
+      expect: () => [
+        GameLoaded(tInitialBoard.copyWith(score: 200), highScore: 200),
+      ],
+      verify: (_) {
+        verify(mockMoveTilesUseCase.call(any, any)).called(1);
+        verify(mockCheckGameOverUseCase.call(any)).called(1);
+        verifyNever(mockGameRepository.saveBoard(any));
         verify(
           mockSaveHighScoreUseCase.call(const HighScore(score: 200)),
         ).called(1);
+      },
+    );
+
+    blocTest<GameBloc, GameState>(
+      'should not save new high score if current score is not greater',
+      build: () {
+        when(
+          mockMoveTilesUseCase.call(any, any),
+        ).thenAnswer((_) async => (tInitialBoard.copyWith(score: 50), true));
+        when(mockCheckGameOverUseCase.call(any)).thenAnswer((_) async => false);
+        when(mockSaveHighScoreUseCase.call(any)).thenAnswer((_) async => {});
+        return gameBloc;
+      },
+      seed: () => const GameLoaded(tInitialBoard, highScore: 100),
+      act: (bloc) => bloc.add(const GameMoveEvent(MoveDirection.up)),
+      expect: () => [
+        GameLoaded(tInitialBoard.copyWith(score: 50), highScore: 100),
+      ],
+      verify: (_) {
+        verify(mockMoveTilesUseCase.call(any, any)).called(1);
+        verify(mockCheckGameOverUseCase.call(any)).called(1);
+        verifyNever(mockGameRepository.saveBoard(any));
+        verifyNever(mockSaveHighScoreUseCase.call(any));
+      },
+    );
+
+    blocTest<GameBloc, GameState>(
+      'should emit GameLoaded with new board and score on NewGameEvent',
+      build: () {
+        when(
+          mockGameRepository.newGame(),
+        ).thenAnswer((_) async => tInitialBoard);
+        when(
+          mockGetHighScoreUseCase.call(),
+        ).thenAnswer((_) async => tHighScore);
+        when(mockGameRepository.clearBoard()).thenAnswer((_) async => {});
+        return gameBloc;
+      },
+      seed: () => GameLoaded(
+        tInitialBoard,
+        highScore: tHighScore.score,
+        isGameOver: true,
+      ),
+      act: (bloc) => bloc.add(NewGameEvent()),
+      expect: () => [
+        GameLoaded(tInitialBoard, highScore: tHighScore.score),
+      ],
+      verify: (_) {
+        verify(mockGameRepository.newGame()).called(1);
+        verify(mockGameRepository.clearBoard()).called(1);
+        verifyNever(mockGameRepository.saveBoard(any));
+        verify(mockGetHighScoreUseCase.call()).called(1);
+      },
+    );
+
+    blocTest<GameBloc, GameState>(
+      'should save the current game board on SaveGameEvent',
+      build: () {
+        when(mockGameRepository.saveBoard(any)).thenAnswer((_) async => {});
+        return gameBloc;
+      },
+      seed: () => GameLoaded(tInitialBoard, highScore: tHighScore.score),
+      act: (bloc) => bloc.add(SaveGameEvent()),
+      expect: () => <GameState>[], // No state change expected for SaveGameEvent
+      verify: (_) {
+        verify(mockGameRepository.saveBoard(tInitialBoard)).called(1);
       },
     );
   });

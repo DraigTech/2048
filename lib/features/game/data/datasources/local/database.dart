@@ -1,35 +1,31 @@
 import 'dart:io';
 
+import 'package:draig_2048/features/game/data/datasources/local/tables/game_states.dart';
+import 'package:draig_2048/features/game/data/datasources/local/tables/high_scores.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+part 'daos/game_state_dao.dart';
+part 'daos/high_score_dao.dart';
 part 'database.g.dart';
 
-/// Table definition for HighScores.
-@DataClassName('HighScore')
-class HighScores extends Table {
-  /// The ID of the high score entry.
-  /// Defaults to 1, ensuring a single entry for the high score.
-  IntColumn get id => integer().withDefault(const Constant(1))();
-
-  /// The score achieved in the game.
-  IntColumn get score => integer()();
-
-  @override
-  Set<Column> get primaryKey => {id};
-}
-
-/// The main database class for the application, using Drift.
-///
-/// This class manages the HighScores table and provides database operations.
-@DriftDatabase(tables: [HighScores])
+/// The main database class.
+@DriftDatabase(
+  tables: [HighScores, GameStates],
+  daos: [GameStateDao, HighScoreDao],
+)
 class AppDatabase extends _$AppDatabase {
   /// Creates an instance of [AppDatabase].
   ///
   /// It opens a connection to the database file.
   AppDatabase() : super(_openConnection());
+
+  /// Creates an instance of [AppDatabase] for testing purposes.
+  ///
+  /// It accepts a [QueryExecutor] for an in-memory database.
+  AppDatabase.forTesting(super.e);
 
   @override
   int get schemaVersion => 1;

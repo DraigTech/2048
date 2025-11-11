@@ -20,11 +20,11 @@ This document specifies a feature that automatically saves the player's game pro
 
 ### Scenario 1: Seamlessly Continue an Interrupted Game
 
-**As a player**, I want my game to be saved automatically after every move,
-**So that** I can continue playing exactly where I left off, even if I close the app.
+**As a player**, I want my game to be saved automatically when I switch away from the app,
+**So that** I can continue playing exactly where I left off.
 
 - **Given** a player has made several moves and has a score of X and a specific board layout,
-- **When** the player closes and reopens the application,
+- **When** the player puts the app into the background and then reopens it,
 - **Then** the game board is restored to the exact same layout,
 - **And** the score is restored to X,
 - **And** the game is immediately ready for the next move.
@@ -54,7 +54,7 @@ This document specifies a feature that automatically saves the player's game pro
 
 | ID | Requirement |
 |---|---|
-| FR1 | The system **must** automatically save the complete game state after every valid user move. The game state includes the value and position of every tile on the board and the current score. |
+| FR1 | The system **must** automatically save the complete game state when the application enters a background or paused state. |
 | FR2 | Upon application launch, the system **must** check for a locally persisted game state. |
 | FR3 | If a saved game state exists, the system **must** load it and present it to the user, ready for play, without requiring any user interaction. |
 | FR4 | If no saved game state exists, the system **must** create and present a new, standard starting game board. |
@@ -80,4 +80,4 @@ This document specifies a feature that automatically saves the player's game pro
 
 - Cloud synchronization of game state across multiple devices.
 - Saving a history of moves or providing an "undo" feature.
-- Managing multiple save slots or named games.
+- Saving game settings or preferences (this is only about the board and score). |

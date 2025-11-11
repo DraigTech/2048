@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:draig_2048/features/game/data/datasources/local/database.dart'
-    hide HighScore;
+    as db;
 import 'package:draig_2048/features/game/domain/entities/game_board.dart';
 import 'package:draig_2048/features/game/domain/entities/high_score.dart';
 import 'package:draig_2048/features/game/domain/entities/tile.dart';
@@ -15,16 +16,17 @@ import 'package:uuid/uuid.dart';
 /// moving tiles, checking for game over conditions, and managing high scores.
 class GameRepositoryImpl implements GameRepository {
   /// Creates an instance of [GameRepositoryImpl].
-  GameRepositoryImpl(this._database);
+  GameRepositoryImpl(this._database, this._gameStateDao);
 
   /// The size of the game board (e.g., 4 for a 4x4 board).
   static const int _boardSize = 4;
 
-  /// A random number generator used for placing new tiles.
+  /// A random number generator for placing new tiles.
   final Random _random = Random();
 
   /// The local database instance for storing high scores.
-  final AppDatabase _database;
+  final db.AppDatabase _database;
+  final db.GameStateDao _gameStateDao;
 
   /// A UUID generator for creating unique tile IDs.
   final Uuid _uuid = const Uuid();
@@ -32,10 +34,64 @@ class GameRepositoryImpl implements GameRepository {
   /// Generates a unique ID for a new tile.
   String _generateUniqueId() => _uuid.v4();
 
-  /// Starts a new game by creating an empty game board and adding two random
-  /// tiles.
-  ///
-  /// Returns a [GameBoard] representing the initial state of the new game.
+  @override
+  Future<GameBoard?> loadBoard() async {
+    final savedState = await _gameStateDao.getLatestGameState();
+    if (savedState == null) {
+      return null;
+    }
+
+    final decodedList = jsonDecode(savedState.board) as List<dynamic>;
+    final intTiles = decodedList
+        .map((row) => (row as List<dynamic>).map((e) => e as int).toList())
+        .toList();
+
+    final tiles = List<List<Tile?>>.generate(
+      _boardSize,
+      (_) => List.filled(_boardSize, null),
+    );
+
+    for (var r = 0; r < _boardSize; r++) {
+      for (var c = 0; c < _boardSize; c++) {
+        if (intTiles[r][c] != 0) {
+          tiles[r][c] = Tile(
+            id: _generateUniqueId(),
+            value: intTiles[r][c],
+            row: r,
+            column: c,
+          );
+        }
+      }
+    }
+
+    return GameBoard(tiles: _flattenTiles(tiles), score: savedState.score);
+  }
+
+  @override
+  Future<void> saveBoard(GameBoard board) async {
+    final tiles = _copyTiles(board.tiles);
+    final intTiles = List<List<int>>.generate(
+      _boardSize,
+      (r) => List.generate(
+        _boardSize,
+        (c) => tiles[r][c]?.value ?? 0,
+      ),
+    );
+
+    final entry = db.GameStatesCompanion(
+      id: const drift.Value(1),
+      board: drift.Value(jsonEncode(intTiles)),
+      score: drift.Value(board.score),
+      createdAt: drift.Value(DateTime.now()),
+    );
+    await _gameStateDao.saveGameState(entry);
+  }
+
+  @override
+  Future<void> clearBoard() async {
+    await _gameStateDao.clearGameStates();
+  }
+
   @override
   Future<GameBoard> newGame() async {
     final tiles = List<List<Tile?>>.generate(
@@ -47,11 +103,6 @@ class GameRepositoryImpl implements GameRepository {
     return GameBoard(tiles: _flattenTiles(tiles));
   }
 
-  /// Moves the tiles on the [board] in the specified [direction].
-  ///
-  /// Returns a tuple containing:
-  /// - The updated [GameBoard] after the move.
-  /// - A boolean indicating whether any tiles were merged during the move.
   @override
   Future<(GameBoard, bool)> move(
     GameBoard board,
@@ -83,10 +134,6 @@ class GameRepositoryImpl implements GameRepository {
     );
   }
 
-  /// Checks if the game is over for the given [board].
-  ///
-  /// The game is over if there are no empty cells and no possible merges.
-  /// Returns `true` if the game is over, `false` otherwise.
   @override
   Future<bool> isGameOver(GameBoard board) async {
     final tiles = _copyTiles(board.tiles);
@@ -118,9 +165,6 @@ class GameRepositoryImpl implements GameRepository {
     return true;
   }
 
-  /// Retrieves the highest score recorded in the database.
-  ///
-  /// Returns a [HighScore] object representing the highest score.
   @override
   Future<HighScore> getHighScore() async {
     final results = await _database.select(_database.highScores).get();
@@ -134,15 +178,12 @@ class GameRepositoryImpl implements GameRepository {
     }
   }
 
-  /// Saves the given [highScore] to the database.
-  ///
-  /// If a high score already exists, it will be replaced.
   @override
   Future<void> saveHighScore(HighScore highScore) async {
     await _database
         .into(_database.highScores)
         .insert(
-          HighScoresCompanion.insert(
+          db.HighScoresCompanion.insert(
             id: const drift.Value(1),
             score: highScore.score,
           ),
@@ -150,6 +191,7 @@ class GameRepositoryImpl implements GameRepository {
         );
   }
 
+  /// Flattens a 2D list of [Tile]s into a 1D list.
   List<List<Tile>> _flattenTiles(List<List<Tile?>> tiles) {
     final flattened = <List<Tile>>[];
 
