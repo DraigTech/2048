@@ -4,34 +4,43 @@
   "@appTitle": {
     "description": "The title of the application"
   },
-  "scoreLabel": "Score: {score}",
+  "scoreLabel": "Score",
   "@scoreLabel": {
-    "description": "Label for current score",
+    "description": "Label for current score"
+  },
+  "highScoreLabel": "Best",
+  "@highScoreLabel": {
+    "description": "Label for high score"
+  },
+  "gameOverTitle": "Game Over!",
+  "@gameOverTitle": {
+    "description": "The main title text displayed on the screen when the game has finished."
+  },
+  "gameOverScoreMessage": "You scored {score} points.",
+  "@gameOverScoreMessage": {
+    "description": "Message displayed on the 'Game Over' screen, informing the user of their final score.",
     "placeholders": {
       "score": {
-        "type": "int"
+        "type": "int",
+        "format": "decimalPattern",
+        "example": "150"
       }
     }
   },
-  "highScoreLabel": "High Score: {highScore}",
-  "@highScoreLabel": {
-    "description": "Label for high score",
-    "placeholders": {
-      "highScore": {
-        "type": "int"
-      }
-    }
-  },
-  "gameOver": "Game Over!",
-  "@gameOver": {
-    "description": "Message when game is over"
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Button text to cancel"
   },
   "playAgain": "Play Again",
   "@playAgain": {
     "description": "Button text to start a new game"
   },
-  "unknownState": "Unknown State",
-  "@unknownState": {
-    "description": "Message for unknown game state"
+  "loadGameFailed": "Failed to load game. Please try again.",
+  "@loadGameFailed": {
+    "description": "Message displayed when the game fails to load from storage."
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Button text to retry"
   }
 }

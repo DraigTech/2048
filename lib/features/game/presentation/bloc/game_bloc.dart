@@ -60,18 +60,25 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     GameStartEvent event,
     Emitter<GameState> emit,
   ) async {
-    final loadedBoard = await repository.loadBoard();
-    if (loadedBoard != null) {
-      final currentHighScore = await getHighScore();
-      emit(GameLoaded(loadedBoard, highScore: currentHighScore.score));
-    } else {
-      add(NewGameEvent());
+    try {
+      final loadedBoard = await repository.loadBoard();
+      if (loadedBoard != null) {
+        final currentHighScore = await getHighScore();
+        emit(GameLoaded(loadedBoard, highScore: currentHighScore.score));
+      } else {
+        add(NewGameEvent());
+      }
+      _moveAudio = await FlameAudio.createPool(
+        Assets.audio.move,
+        maxPlayers: 1,
+      );
+      _mergeAudio = await FlameAudio.createPool(
+        Assets.audio.merge,
+        maxPlayers: 1,
+      );
+    } on Exception catch (e) {
+      emit(GameError(e.toString()));
     }
-    _moveAudio = await FlameAudio.createPool(Assets.audio.move, maxPlayers: 1);
-    _mergeAudio = await FlameAudio.createPool(
-      Assets.audio.merge,
-      maxPlayers: 1,
-    );
   }
 
   /// Handles the [GameMoveEvent] to process tile movements.

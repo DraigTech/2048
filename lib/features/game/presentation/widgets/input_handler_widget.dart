@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 
 /// A widget that handles user input for the game,
 /// including keyboard and swipe gestures.
-class InputHandler extends StatelessWidget {
-  /// Creates an [InputHandler] instance.
-  const InputHandler({
+class InputHandlerWidget extends StatelessWidget {
+  /// Creates an [InputHandlerWidget] instance.
+  const InputHandlerWidget({
     required this.child,
     required this.focusNode,
     required this.moveUp,

@@ -53,7 +53,7 @@ class GameBoardWidget extends StatelessWidget {
         children: [
           Positioned.fill(
             child: GridView.builder(
-              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
