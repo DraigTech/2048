@@ -17,7 +17,7 @@ class $HighScoresTable extends HighScores
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
-    defaultValue: Constant(1),
+    defaultValue: const Constant(1),
   );
   static const VerificationMeta _scoreMeta = const VerificationMeta('score');
   @override
@@ -80,7 +80,11 @@ class $HighScoresTable extends HighScores
 }
 
 class HighScore extends DataClass implements Insertable<HighScore> {
+  /// The ID of the high score entry.
+  /// Defaults to 1, ensuring a single entry for the high score.
   final int id;
+
+  /// The score achieved in the game.
   final int score;
   const HighScore({required this.id, required this.score});
   @override
@@ -187,15 +191,319 @@ class HighScoresCompanion extends UpdateCompanion<HighScore> {
   }
 }
 
+class $GameStatesTable extends GameStates
+    with TableInfo<$GameStatesTable, GameState> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GameStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _boardMeta = const VerificationMeta('board');
+  @override
+  late final GeneratedColumn<String> board = GeneratedColumn<String>(
+    'board',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _scoreMeta = const VerificationMeta('score');
+  @override
+  late final GeneratedColumn<int> score = GeneratedColumn<int>(
+    'score',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, board, score, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'game_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GameState> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('board')) {
+      context.handle(
+        _boardMeta,
+        board.isAcceptableOrUnknown(data['board']!, _boardMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_boardMeta);
+    }
+    if (data.containsKey('score')) {
+      context.handle(
+        _scoreMeta,
+        score.isAcceptableOrUnknown(data['score']!, _scoreMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scoreMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  GameState map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GameState(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      board: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}board'],
+      )!,
+      score: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}score'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $GameStatesTable createAlias(String alias) {
+    return $GameStatesTable(attachedDatabase, alias);
+  }
+}
+
+class GameState extends DataClass implements Insertable<GameState> {
+  /// The ID of the game state entry.
+  /// Defaults to 1, ensuring a single entry for the game state.
+  final int id;
+
+  /// A JSON string representation of the game board.
+  final String board;
+
+  /// The score of the game.
+  final int score;
+
+  /// The timestamp when the state was saved.
+  final DateTime createdAt;
+  const GameState({
+    required this.id,
+    required this.board,
+    required this.score,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['board'] = Variable<String>(board);
+    map['score'] = Variable<int>(score);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  GameStatesCompanion toCompanion(bool nullToAbsent) {
+    return GameStatesCompanion(
+      id: Value(id),
+      board: Value(board),
+      score: Value(score),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory GameState.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GameState(
+      id: serializer.fromJson<int>(json['id']),
+      board: serializer.fromJson<String>(json['board']),
+      score: serializer.fromJson<int>(json['score']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'board': serializer.toJson<String>(board),
+      'score': serializer.toJson<int>(score),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  GameState copyWith({
+    int? id,
+    String? board,
+    int? score,
+    DateTime? createdAt,
+  }) => GameState(
+    id: id ?? this.id,
+    board: board ?? this.board,
+    score: score ?? this.score,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  GameState copyWithCompanion(GameStatesCompanion data) {
+    return GameState(
+      id: data.id.present ? data.id.value : this.id,
+      board: data.board.present ? data.board.value : this.board,
+      score: data.score.present ? data.score.value : this.score,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GameState(')
+          ..write('id: $id, ')
+          ..write('board: $board, ')
+          ..write('score: $score, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, board, score, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GameState &&
+          other.id == this.id &&
+          other.board == this.board &&
+          other.score == this.score &&
+          other.createdAt == this.createdAt);
+}
+
+class GameStatesCompanion extends UpdateCompanion<GameState> {
+  final Value<int> id;
+  final Value<String> board;
+  final Value<int> score;
+  final Value<DateTime> createdAt;
+  const GameStatesCompanion({
+    this.id = const Value.absent(),
+    this.board = const Value.absent(),
+    this.score = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  GameStatesCompanion.insert({
+    this.id = const Value.absent(),
+    required String board,
+    required int score,
+    required DateTime createdAt,
+  }) : board = Value(board),
+       score = Value(score),
+       createdAt = Value(createdAt);
+  static Insertable<GameState> custom({
+    Expression<int>? id,
+    Expression<String>? board,
+    Expression<int>? score,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (board != null) 'board': board,
+      if (score != null) 'score': score,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  GameStatesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? board,
+    Value<int>? score,
+    Value<DateTime>? createdAt,
+  }) {
+    return GameStatesCompanion(
+      id: id ?? this.id,
+      board: board ?? this.board,
+      score: score ?? this.score,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (board.present) {
+      map['board'] = Variable<String>(board.value);
+    }
+    if (score.present) {
+      map['score'] = Variable<int>(score.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GameStatesCompanion(')
+          ..write('id: $id, ')
+          ..write('board: $board, ')
+          ..write('score: $score, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $HighScoresTable highScores = $HighScoresTable(this);
+  late final $GameStatesTable gameStates = $GameStatesTable(this);
+  late final GameStateDao gameStateDao = GameStateDao(this as AppDatabase);
+  late final HighScoreDao highScoreDao = HighScoreDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [highScores];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [highScores, gameStates];
 }
 
 typedef $$HighScoresTableCreateCompanionBuilder =
@@ -318,10 +626,191 @@ typedef $$HighScoresTableProcessedTableManager =
       HighScore,
       PrefetchHooks Function()
     >;
+typedef $$GameStatesTableCreateCompanionBuilder =
+    GameStatesCompanion Function({
+      Value<int> id,
+      required String board,
+      required int score,
+      required DateTime createdAt,
+    });
+typedef $$GameStatesTableUpdateCompanionBuilder =
+    GameStatesCompanion Function({
+      Value<int> id,
+      Value<String> board,
+      Value<int> score,
+      Value<DateTime> createdAt,
+    });
+
+class $$GameStatesTableFilterComposer
+    extends Composer<_$AppDatabase, $GameStatesTable> {
+  $$GameStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get board => $composableBuilder(
+    column: $table.board,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get score => $composableBuilder(
+    column: $table.score,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$GameStatesTableOrderingComposer
+    extends Composer<_$AppDatabase, $GameStatesTable> {
+  $$GameStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get board => $composableBuilder(
+    column: $table.board,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get score => $composableBuilder(
+    column: $table.score,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$GameStatesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $GameStatesTable> {
+  $$GameStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get board =>
+      $composableBuilder(column: $table.board, builder: (column) => column);
+
+  GeneratedColumn<int> get score =>
+      $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$GameStatesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $GameStatesTable,
+          GameState,
+          $$GameStatesTableFilterComposer,
+          $$GameStatesTableOrderingComposer,
+          $$GameStatesTableAnnotationComposer,
+          $$GameStatesTableCreateCompanionBuilder,
+          $$GameStatesTableUpdateCompanionBuilder,
+          (
+            GameState,
+            BaseReferences<_$AppDatabase, $GameStatesTable, GameState>,
+          ),
+          GameState,
+          PrefetchHooks Function()
+        > {
+  $$GameStatesTableTableManager(_$AppDatabase db, $GameStatesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GameStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GameStatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GameStatesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> board = const Value.absent(),
+                Value<int> score = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => GameStatesCompanion(
+                id: id,
+                board: board,
+                score: score,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String board,
+                required int score,
+                required DateTime createdAt,
+              }) => GameStatesCompanion.insert(
+                id: id,
+                board: board,
+                score: score,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$GameStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $GameStatesTable,
+      GameState,
+      $$GameStatesTableFilterComposer,
+      $$GameStatesTableOrderingComposer,
+      $$GameStatesTableAnnotationComposer,
+      $$GameStatesTableCreateCompanionBuilder,
+      $$GameStatesTableUpdateCompanionBuilder,
+      (GameState, BaseReferences<_$AppDatabase, $GameStatesTable, GameState>),
+      GameState,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$HighScoresTableTableManager get highScores =>
       $$HighScoresTableTableManager(_db, _db.highScores);
+  $$GameStatesTableTableManager get gameStates =>
+      $$GameStatesTableTableManager(_db, _db.gameStates);
+}
+
+mixin _$GameStateDaoMixin on DatabaseAccessor<AppDatabase> {
+  $GameStatesTable get gameStates => attachedDatabase.gameStates;
+}
+mixin _$HighScoreDaoMixin on DatabaseAccessor<AppDatabase> {
+  $HighScoresTable get highScores => attachedDatabase.highScores;
 }

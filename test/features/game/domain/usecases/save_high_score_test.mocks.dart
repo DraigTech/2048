@@ -5,8 +5,10 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i5;
 
-import 'package:draig_2048/features/game/domain/entities/game_board.dart' as _i2;
-import 'package:draig_2048/features/game/domain/entities/high_score.dart' as _i3;
+import 'package:draig_2048/features/game/domain/entities/game_board.dart'
+    as _i2;
+import 'package:draig_2048/features/game/domain/entities/high_score.dart'
+    as _i3;
 import 'package:draig_2048/features/game/domain/repositories/game_repository.dart'
     as _i4;
 import 'package:mockito/mockito.dart' as _i1;
@@ -92,6 +94,32 @@ class MockGameRepository extends _i1.Mock implements _i4.GameRepository {
   _i5.Future<void> saveHighScore(_i3.HighScore? highScore) =>
       (super.noSuchMethod(
             Invocation.method(#saveHighScore, [highScore]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<_i2.GameBoard?> loadBoard() =>
+      (super.noSuchMethod(
+            Invocation.method(#loadBoard, []),
+            returnValue: _i5.Future<_i2.GameBoard?>.value(),
+          )
+          as _i5.Future<_i2.GameBoard?>);
+
+  @override
+  _i5.Future<void> saveBoard(_i2.GameBoard? board) =>
+      (super.noSuchMethod(
+            Invocation.method(#saveBoard, [board]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> clearBoard() =>
+      (super.noSuchMethod(
+            Invocation.method(#clearBoard, []),
             returnValue: _i5.Future<void>.value(),
             returnValueForMissingStub: _i5.Future<void>.value(),
           )

@@ -12,14 +12,43 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 ///
 /// This widget is responsible for building the game UI, handling game events,
 /// and displaying game-related information such as score and game over status.
-class GameScreen extends StatelessWidget {
+class GameScreen extends StatefulWidget {
   /// Creates a [GameScreen] instance.
   const GameScreen({super.key});
 
   @override
+  State<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
+  late final FocusNode gameBoardFocus;
+
+  @override
+  void initState() {
+    super.initState();
+    gameBoardFocus = FocusNode();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    gameBoardFocus.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      context.read<GameBloc>().add(SaveGameEvent());
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final gameBoardFocus = FocusNode();
 
     return BlocListener<GameBloc, GameState>(
       listener: (context, state) {

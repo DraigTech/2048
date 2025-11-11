@@ -34,6 +34,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<GameMoveEvent>(_onGameMoved);
     on<CheckGameOverEvent>(_onCheckGameOver);
     on<NewGameEvent>(_onNewGame);
+    on<SaveGameEvent>(_onSaveGame);
   }
 
   /// Use case for moving tiles on the game board.
@@ -59,7 +60,13 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     GameStartEvent event,
     Emitter<GameState> emit,
   ) async {
-    add(NewGameEvent());
+    final loadedBoard = await repository.loadBoard();
+    if (loadedBoard != null) {
+      final currentHighScore = await getHighScore();
+      emit(GameLoaded(loadedBoard, highScore: currentHighScore.score));
+    } else {
+      add(NewGameEvent());
+    }
     _moveAudio = await FlameAudio.createPool(Assets.audio.move, maxPlayers: 1);
     _mergeAudio = await FlameAudio.createPool(
       Assets.audio.merge,
@@ -125,8 +132,20 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   ///
   /// It creates a new game board and loads the current high score.
   Future<void> _onNewGame(NewGameEvent event, Emitter<GameState> emit) async {
+    await repository.clearBoard();
     final newBoard = await repository.newGame();
     final currentHighScore = await getHighScore();
     emit(GameLoaded(newBoard, highScore: currentHighScore.score));
+  }
+
+  /// Handles the [SaveGameEvent] to save the current game state.
+  Future<void> _onSaveGame(
+    SaveGameEvent event,
+    Emitter<GameState> emit,
+  ) async {
+    if (state is GameLoaded) {
+      final currentState = state as GameLoaded;
+      await repository.saveBoard(currentState.gameBoard);
+    }
   }
 }

@@ -27,6 +27,17 @@ abstract class GameRepository {
 
   /// Saves the given [highScore].
   Future<void> saveHighScore(HighScore highScore);
+
+  /// Loads the saved game board from persistence.
+  ///
+  /// Returns the saved [GameBoard] or `null` if no saved game exists.
+  Future<GameBoard?> loadBoard();
+
+  /// Saves the current [board] to persistence.
+  Future<void> saveBoard(GameBoard board);
+
+  /// Clears the saved game board from persistence.
+  Future<void> clearBoard();
 }
 
 /// Represents the possible directions for moving tiles on the game board.

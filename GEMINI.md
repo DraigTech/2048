@@ -1,31 +1,53 @@
 # 2048 Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2025-10-30
+Last updated: 2025-11-07
+
+This document provides a consolidated overview of the technologies, architectural patterns, and commands used in this project, based on all implemented features.
 
 ## Active Technologies
-- Dart (with Flutter SDK) + flutter_bloc (002-intuitive-input)
 
-- Dart (with Flutter SDK) + Flutter, Flame, BLoC, get_it, go_router, Drift, flutter_gen, flutter_localizations (001-2048-puzzle-game)
+- **Primary Stack**: Dart (with Flutter SDK)
+- **UI Framework**: Flutter
+- **Game Engine**: Flame
+- **State Management**: flutter_bloc (BLoC)
+- **Routing**: go_router
+- **Local Database**: Drift
+- **Dependency Injection**: get_it
+- **Code Generation**: flutter_gen (for assets), build_runner (for Drift)
+- **Localization**: flutter_localizations
 
 ## Project Structure
 
+The project follows the standard Flutter layout:
+
 ```text
-src/
-tests/
+lib/
+  ├── core/         # Core components: DI, routing, database
+  ├── features/     # Feature-based modules (e.g., game, settings)
+  ├── generated/    # Auto-generated files
+  └── main.dart     # App entry point
+test/
+  └── ...           # Unit and widget tests
 ```
 
 ## Commands
 
-# Add commands for Dart (with Flutter SDK)
+- **Install Dependencies**: `flutter pub get`
+- **Run Code Generation**: `dart run build_runner build --delete-conflicting-outputs`
+- **Analyze Code**: `flutter analyze`
+- **Run Tests**: `flutter test`
 
 ## Code Style
 
-Dart (with Flutter SDK): Follow standard conventions
+- **Primary**: Follow standard Dart and Flutter conventions.
+- **Strict Linting**: All code **must** strictly adhere to the rules defined in `analysis_options.yaml`. Pay close attention to `public_member_api_docs`, `directives_ordering`, and `require_trailing_commas`.
 
-## Recent Changes
-- 002-intuitive-input: Added Dart (with Flutter SDK) + flutter_bloc
+## Feature History
 
-- 001-2048-puzzle-game: Added Dart (with Flutter SDK) + Flutter, Flame, BLoC, get_it, go_router, Drift, flutter_gen, flutter_localizations
+- **004-save-game-state**: Implemented local persistence for game state using Drift.
+- **003-game-over-screen**: Added the game over UI and logic.
+- **002-intuitive-input**: Implemented gesture-based controls for the game board.
+- **001-2048-puzzle-game**: Established the initial project structure and core 2048 game logic using Flutter, Flame, and BLoC.
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

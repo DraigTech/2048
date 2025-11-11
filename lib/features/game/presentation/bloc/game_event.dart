@@ -29,3 +29,6 @@ class CheckGameOverEvent extends GameEvent {}
 
 /// Event to start a new game.
 class NewGameEvent extends GameEvent {}
+
+/// Event to trigger saving the current game state.
+class SaveGameEvent extends GameEvent {}
