@@ -1,7 +1,7 @@
 part of 'game_bloc.dart';
 
 /// Abstract base class for all game states.
-abstract class GameState extends Equatable {
+sealed class GameState extends Equatable {
   /// Creates a [GameState] instance.
   const GameState();
 
@@ -33,4 +33,17 @@ class GameLoaded extends GameState {
 
   @override
   List<Object> get props => [gameBoard, highScore, isGameOver];
+}
+
+
+/// State representing an error during game operations.
+final class GameError extends GameState {
+  /// Creates a [GameError] state.
+  const GameError(this.message);
+
+  /// The error message associated with the state.
+  final String message;
+
+  @override
+  List<Object> get props => [message];
 }
