@@ -9,6 +9,7 @@ This document provides a consolidated overview of the technologies, architectura
 - **Primary Stack**: Dart (with Flutter SDK)
 - **UI Framework**: Flutter
 - **Game Engine**: Flame
+- **Audio**: flame_audio
 - **State Management**: flutter_bloc (BLoC)
 - **Routing**: go_router
 - **Local Database**: Drift
@@ -44,6 +45,7 @@ test/
 
 ## Feature History
 
+- **005-gameplay-enhancements**: Added audio controls, settings persistence, and a replay button.
 - **004-save-game-state**: Implemented local persistence for game state using Drift.
 - **003-game-over-screen**: Added the game over UI and logic.
 - **002-intuitive-input**: Implemented gesture-based controls for the game board.
