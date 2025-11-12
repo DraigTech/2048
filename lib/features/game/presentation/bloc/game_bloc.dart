@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:draig_2048/core/assets/assets.gen.dart';
 import 'package:draig_2048/features/game/domain/entities/game_board.dart';
 import 'package:draig_2048/features/game/domain/entities/high_score.dart';
 import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
@@ -8,7 +9,6 @@ import 'package:draig_2048/features/game/domain/usecases/check_game_over.dart';
 import 'package:draig_2048/features/game/domain/usecases/get_high_score.dart';
 import 'package:draig_2048/features/game/domain/usecases/move_tiles.dart';
 import 'package:draig_2048/features/game/domain/usecases/save_high_score.dart';
-import 'package:draig_2048/generated/assets.gen.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flame_audio/flame_audio.dart';
 
