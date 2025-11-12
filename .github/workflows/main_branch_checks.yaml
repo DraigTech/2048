@@ -1,0 +1,60 @@
+# This GitHub Actions workflow is designed to ensure the quality and integrity of the
+# codebase for the 2048 Flutter project. It automatically triggers on pushes and
+# pull requests to the 'main' branch.
+#
+# The workflow follows the best practices and commands outlined in the project's
+# constitution, performing the following key steps:
+#   1. Sets up the precise Flutter environment.
+#   2. Caches dependencies for faster execution on subsequent runs.
+#   3. Installs all required project dependencies.
+#   4. Runs the build_runner to generate necessary code (e.g., for Drift, GoRouter).
+#   5. Performs static analysis (linting) to enforce code style and catch errors.
+#   6. Executes the project's test suite.
+#   7. Compiles both an Android APK and a Web build to verify that the application
+#      builds successfully on major target platforms.
+#
+# If any of these steps fail, the workflow will fail, providing immediate feedback
+# and preventing the introduction of broken code into the main branch.
+
+name: Main Branch Checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_and_test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # Ensure this version matches the one specified in your pubspec.yaml
+          flutter-version: '3.22.0'
+          channel: 'stable'
+          cache: true # Enable caching for faster builds
+
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze project source
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build Android APK
+        run: flutter build apk --debug
+
+      - name: Build Web
+        run: flutter build web
