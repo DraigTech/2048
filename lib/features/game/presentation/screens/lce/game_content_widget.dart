@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:draig_2048/core/assets/assets.gen.dart';
 import 'package:draig_2048/core/l10n/app_localizations.dart';
 import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
 import 'package:draig_2048/features/game/presentation/bloc/game_bloc.dart';
@@ -7,7 +8,6 @@ import 'package:draig_2048/features/game/presentation/widgets/game_board_widget.
 import 'package:draig_2048/features/game/presentation/widgets/game_score_widget.dart';
 import 'package:draig_2048/features/game/presentation/widgets/image_border_widget.dart';
 import 'package:draig_2048/features/game/presentation/widgets/input_handler_widget.dart';
-import 'package:draig_2048/generated/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
