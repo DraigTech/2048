@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:draig_2048/core/l10n/app_localizations.dart';
 import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
 import 'package:draig_2048/features/game/presentation/bloc/game_bloc.dart';
@@ -30,10 +32,10 @@ class GameContentWidget extends StatelessWidget {
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 600;
         final gameBoardSize = isWide
-            ? constraints.maxHeight * 0.9
-            : constraints.maxWidth * 0.9;
-        const scoreSize = Size(100, 100);
-        const logoSize = Size(150, 150);
+            ? min(constraints.maxWidth * 0.4, constraints.maxHeight * 0.9)
+            : min(constraints.maxHeight * 0.4, constraints.maxWidth * 0.9);
+        final scoreSize = Size(gameBoardSize * 0.25, gameBoardSize * 0.25);
+        final logoSize = Size(gameBoardSize * 0.4, gameBoardSize * 0.4);
 
         if (isWide) {
           // Wide layout

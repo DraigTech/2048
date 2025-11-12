@@ -7,15 +7,11 @@ class GameScoreWidget extends StatelessWidget {
     required this.size,
     required this.scoreLabel,
     required this.score,
-    this.fontSize = 20,
     super.key,
   });
 
   /// The size of the widget.
   final Size size;
-
-  /// The font size of the score.
-  final double fontSize;
 
   /// The label for the score.
   final String scoreLabel;
@@ -39,18 +35,16 @@ class GameScoreWidget extends StatelessWidget {
         children: [
           Text(
             scoreLabel.toUpperCase(),
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w900,
-              fontSize: fontSize,
             ),
           ),
           Text(
             score,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w900,
-              fontSize: fontSize,
             ),
           ),
         ],
