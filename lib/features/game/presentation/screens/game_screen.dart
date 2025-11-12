@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
+import 'package:auto_route/auto_route.dart';
 import 'package:draig_2048/core/l10n/app_localizations.dart';
 import 'package:draig_2048/features/game/presentation/bloc/game_bloc.dart';
 import 'package:draig_2048/features/game/presentation/screens/lce/game_content_widget.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 ///
 /// This widget is responsible for building the game UI, handling game events,
 /// and displaying game-related information such as score and game over status.
+@RoutePage()
 class GameScreen extends StatefulWidget {
   /// Creates a [GameScreen] instance.
   const GameScreen({super.key});

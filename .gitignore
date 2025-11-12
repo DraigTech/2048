@@ -50,3 +50,4 @@ lib/core/l10n/app_localizations_en.dart
 
 # Test cache
 test/cache
+*.mocks.dart
