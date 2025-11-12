@@ -36,10 +36,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          # Ensure this version matches the one specified in your pubspec.yaml
-          flutter-version: '3.22.0'
+          flutter-version: '3.35.3'
           channel: 'stable'
-          cache: true # Enable caching for faster builds
+          cache: true
 
       - name: Install dependencies
         run: flutter pub get
