@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:draig_2048/features/game/data/datasources/local/tables/game_states.dart';
 import 'package:draig_2048/features/game/data/datasources/local/tables/high_scores.dart';
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path/path.dart' as p;
+import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 part 'daos/game_state_dao.dart';
@@ -29,12 +26,17 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
-}
 
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'db.sqlite'));
-    return NativeDatabase(file);
-  });
+  static QueryExecutor _openConnection() {
+    return driftDatabase(
+      name: 'my_app_db',
+      web: DriftWebOptions(
+        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+        driftWorker: Uri.parse('drift_worker.dart.js'),
+      ),
+      native: const DriftNativeOptions(
+        databaseDirectory: getApplicationSupportDirectory,
+      ),
+    );
+  }
 }
