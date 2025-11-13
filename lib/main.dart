@@ -4,6 +4,7 @@ import 'package:draig_2048/core/l10n/app_localizations.dart';
 import 'package:draig_2048/core/routing/app_router.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Main entry point of the application.
@@ -13,6 +14,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 Future<void> main() async {
   /// Ensure the Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// Set the orientation to portrait only
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   /// Initialize dependencies
   configureDependencies();

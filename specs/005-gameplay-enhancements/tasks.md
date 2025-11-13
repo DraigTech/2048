@@ -26,12 +26,12 @@ description: "Task list for Gameplay Enhancements feature implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Source `background_music.mp3` and add to `assets/audio/`.
-- [ ] T002 Verify `pubspec.yaml` includes `assets/audio/`.
-- [ ] T003 Create `lib/features/settings` directory with `domain`, `data`, `presentation` subdirectories.
-- [ ] T004 Create `lib/features/settings/domain/entities/` and `lib/features/settings/domain/repositories/` directories.
-- [ ] T005 Create `lib/features/settings/data/repositories/` directory.
-- [ ] T006 Create `lib/features/settings/presentation/bloc/` directory.
+- [x] T001 Source `background_music.mp3` and add to `assets/audio/`.
+- [x] T002 Verify `pubspec.yaml` includes `assets/audio/`.
+- [x] T003 Create `lib/features/settings` directory with `domain`, `data`, `presentation` subdirectories.
+- [x] T004 Create `lib/features/settings/domain/entities/` and `lib/features/settings/domain/repositories/` directories.
+- [x] T005 Create `lib/features/settings/data/repositories/` directory.
+- [x] T006 Create `lib/features/settings/presentation/bloc/` directory.
 
 ---
 
@@ -41,15 +41,15 @@ description: "Task list for Gameplay Enhancements feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Define `AudioSettings` Drift table in `lib/core/database/tables/audio_settings.dart`.
-- [ ] T008 Define `AudioSettingsDao` in `lib/core/database/daos/audio_settings_dao.dart`.
-- [ ] T009 Update `lib/core/database/database.dart` to include `AudioSettings` table and `AudioSettingsDao`.
-- [ ] T010 Run `dart run build_runner build --delete-conflicting-outputs` for Drift code generation.
-- [ ] T011 Create `lib/features/settings/domain/entities/audio_settings.dart` for the `AudioSettings` domain entity.
-- [ ] T012 Create `lib/features/settings/domain/repositories/settings_repository.dart` for the `SettingsRepository` interface.
-- [ ] T013 Create `lib/features/settings/data/repositories/settings_repository_impl.dart` to implement `SettingsRepository` using `AudioSettingsDao`.
-- [ ] T014 Create `lib/core/audio/audio_manager.dart` to manage audio playback.
-- [ ] T015 Register `AudioSettingsDao`, `SettingsRepository` (implementation), and `AudioManager` in `lib/core/di/injection.dart`.
+- [x] T007 Define `AudioSettings` Drift table in `lib/core/database/tables/audio_settings.dart`.
+- [x] T008 Define `AudioSettingsDao` in `lib/core/database/daos/audio_settings_dao.dart`.
+- [x] T009 Update `lib/core/database/database.dart` to include `AudioSettings` table and `AudioSettingsDao`.
+- [x] T010 Run `dart run build_runner build --delete-conflicting-outputs` for Drift code generation.
+- [x] T011 Create `lib/features/settings/domain/entities/audio_settings.dart` for the `AudioSettings` domain entity.
+- [x] T012 Create `lib/features/settings/domain/repositories/settings_repository.dart` for the `SettingsRepository` interface.
+- [x] T013 Create `lib/features/settings/data/repositories/settings_repository_impl.dart` to implement `SettingsRepository` using `AudioSettingsDao`.
+- [x] T014 Create `lib/core/audio/audio_manager.dart` to manage audio playback.
+- [x] T015 Register `AudioSettingsDao`, `SettingsRepository` (implementation), and `AudioManager` in `lib/core/di/injection.dart`.
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -63,21 +63,21 @@ description: "Task list for Gameplay Enhancements feature implementation"
 
 ### Tests for User Story 1
 
-- [ ] T016 [P] [US1] Add unit tests for `SettingsBloc` in `test/features/settings/presentation/bloc/settings_bloc_test.dart`.
-- [ ] T017 [P] [US1] Add widget tests for settings `AlertDialog` in `test/features/settings/presentation/widgets/settings_dialog_test.dart`.
+- [x] T016 [P] [US1] Add unit tests for `SettingsBloc` in `test/features/settings/presentation/bloc/settings_bloc_test.dart`.
+- [x] T017 [P] [US1] Add widget tests for settings `AlertDialog` in `test/features/settings/presentation/widgets/settings_dialog_test.dart`.
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Create `lib/features/settings/presentation/bloc/settings_bloc.dart` with `SettingsState` and `SettingsEvent` (LoadSettings, ToggleMusic, ToggleSoundEffects).
-- [ ] T019 [US1] Implement `SettingsBloc` logic to interact with `SettingsRepository` interface.
-- [ ] T020 [US1] Initialize `SettingsBloc` with `LoadSettings` event on app startup.
-- [ ] T021 [US1] Modify `lib/core/audio/audio_manager.dart` to listen to `SettingsBloc` state changes.
-- [ ] T022 [US1] Implement background music playback in `AudioManager` based on `isMusicEnabled`.
-- [ ] T023 [US1] Implement sound effects control in `AudioManager` based on `isSoundEffectsEnabled`.
-- [ ] T024 [US1] Add "Settings" `IconButton` to main game screen widget (e.g., `lib/features/game/presentation/screens/game_page.dart`).
-- [ ] T025 [US1] Implement settings `AlertDialog` (e.g., `lib/features/settings/presentation/widgets/settings_dialog.dart`) with `BlocProvider` and `BlocBuilder` for `SettingsBloc`.
-- [ ] T026 [US1] Add `SwitchListTile` for "Background Music" in settings dialog, dispatch `ToggleMusic` event.
-- [ ] T027 [US1] Add `SwitchListTile` for "Sound Effects" in settings dialog, dispatch `ToggleSoundEffects` event.
+- [x] T018 [US1] Create `lib/features/settings/presentation/bloc/settings_bloc.dart` with `SettingsState` and `SettingsEvent` (LoadSettings, ToggleMusic, ToggleSoundEffects).
+- [x] T019 [US1] Implement `SettingsBloc` logic to interact with `SettingsRepository` interface.
+- [x] T020 [US1] Initialize `SettingsBloc` with `LoadSettings` event on app startup.
+- [x] T021 [US1] Modify `lib/core/audio/audio_manager.dart` to listen to `SettingsBloc` state changes.
+- [x] T022 [US1] Implement background music playback in `AudioManager` based on `isMusicEnabled`.
+- [x] T023 [US1] Implement sound effects control in `AudioManager` based on `isSoundEffectsEnabled`.
+- [x] T024 [US1] Add "Settings" `IconButton` to main game screen widget (e.g., `lib/features/game/presentation/screens/game_page.dart`).
+- [x] T025 [US1] Implement settings `AlertDialog` (e.g., `lib/features/settings/presentation/widgets/settings_dialog.dart`) with `BlocProvider` and `BlocBuilder` for `SettingsBloc`.
+- [x] T026 [US1] Add `SwitchListTile` for "Background Music" in settings dialog, dispatch `ToggleMusic` event.
+- [x] T027 [US1] Add `SwitchListTile` for "Sound Effects" in settings dialog, dispatch `ToggleSoundEffects` event.
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -91,16 +91,16 @@ description: "Task list for Gameplay Enhancements feature implementation"
 
 ### Tests for User Story 2
 
-- [ ] T028 [P] [US2] Add unit tests for `GameBloc` `GameReset` event in `test/features/game/presentation/bloc/game_bloc_test.dart`.
-- [ ] T029 [P] [US2] Add widget tests for replay button and confirmation dialog in `test/features/game/presentation/screens/game_page_test.dart`.
+- [x] T028 [P] [US2] Add unit tests for `GameBloc` `GameReset` event in `test/features/game/presentation/bloc/game_bloc_test.dart`.
+- [x] T029 [P] [US2] Add widget tests for replay button and confirmation dialog in `test/features/game/presentation/screens/game_page_test.dart`.
 
 ### Implementation for User Story 2
 
-- [ ] T030 [US2] Add "Replay" `IconButton` to main game screen widget (e.g., `lib/features/game/presentation/screens/game_page.dart`).
-- [ ] T031 [US2] Implement confirmation `AlertDialog` for replay button.
-- [ ] T032 [US2] Add `GameReset` event to `lib/features/game/presentation/bloc/game_bloc.dart`.
-- [ ] T033 [US2] Implement `GameReset` event handler in `GameBloc` to reset game state.
-- [ ] T034 [US2] Dispatch `GameReset` event from replay confirmation dialog.
+- [x] T030 [US2] Add "Replay" `IconButton` to main game screen widget.
+- [x] T031 [US2] Implement confirmation `AlertDialog` for replay button.
+- [x] T032 [US2] Add `GameReset` event to `lib/features/game/presentation/bloc/game_bloc.dart`.
+- [x] T033 [US2] Implement `GameReset` event handler in `GameBloc` to reset game state.
+- [x] T034 [US2] Dispatch `GameReset` event from replay confirmation dialog.
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -110,9 +110,9 @@ description: "Task list for Gameplay Enhancements feature implementation"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T035 Run `flutter analyze` and fix any linting/analysis issues.
-- [ ] T036 Ensure all new code adheres to `analysis_options.yaml` rules.
-- [ ] T037 Verify edge cases (replay during game over, audio lifecycle management).
+- [x] T035 Run `flutter analyze` and fix any linting/analysis issues.
+- [x] T036 Ensure all new code adheres to `analysis_options.yaml` rules.
+- [x] T037 Verify edge cases (replay during game over, audio lifecycle management).
 
 ---
 

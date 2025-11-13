@@ -492,18 +492,308 @@ class GameStatesCompanion extends UpdateCompanion<GameState> {
   }
 }
 
+class $AudioSettingsTable extends AudioSettings
+    with TableInfo<$AudioSettingsTable, AudioSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AudioSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _isMusicEnabledMeta = const VerificationMeta(
+    'isMusicEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> isMusicEnabled = GeneratedColumn<bool>(
+    'is_music_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_music_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _isSoundEffectsEnabledMeta =
+      const VerificationMeta('isSoundEffectsEnabled');
+  @override
+  late final GeneratedColumn<bool> isSoundEffectsEnabled =
+      GeneratedColumn<bool>(
+        'is_sound_effects_enabled',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_sound_effects_enabled" IN (0, 1))',
+        ),
+        defaultValue: const Constant(true),
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    isMusicEnabled,
+    isSoundEffectsEnabled,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'audio_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AudioSetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('is_music_enabled')) {
+      context.handle(
+        _isMusicEnabledMeta,
+        isMusicEnabled.isAcceptableOrUnknown(
+          data['is_music_enabled']!,
+          _isMusicEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_sound_effects_enabled')) {
+      context.handle(
+        _isSoundEffectsEnabledMeta,
+        isSoundEffectsEnabled.isAcceptableOrUnknown(
+          data['is_sound_effects_enabled']!,
+          _isSoundEffectsEnabledMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AudioSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AudioSetting(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      isMusicEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_music_enabled'],
+      )!,
+      isSoundEffectsEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_sound_effects_enabled'],
+      )!,
+    );
+  }
+
+  @override
+  $AudioSettingsTable createAlias(String alias) {
+    return $AudioSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class AudioSetting extends DataClass implements Insertable<AudioSetting> {
+  /// The ID of the audio setting entry.
+  final int id;
+
+  /// Whether in-game music is enabled.
+  final bool isMusicEnabled;
+
+  /// Whether in-game sound effects are enabled.
+  final bool isSoundEffectsEnabled;
+  const AudioSetting({
+    required this.id,
+    required this.isMusicEnabled,
+    required this.isSoundEffectsEnabled,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['is_music_enabled'] = Variable<bool>(isMusicEnabled);
+    map['is_sound_effects_enabled'] = Variable<bool>(isSoundEffectsEnabled);
+    return map;
+  }
+
+  AudioSettingsCompanion toCompanion(bool nullToAbsent) {
+    return AudioSettingsCompanion(
+      id: Value(id),
+      isMusicEnabled: Value(isMusicEnabled),
+      isSoundEffectsEnabled: Value(isSoundEffectsEnabled),
+    );
+  }
+
+  factory AudioSetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AudioSetting(
+      id: serializer.fromJson<int>(json['id']),
+      isMusicEnabled: serializer.fromJson<bool>(json['isMusicEnabled']),
+      isSoundEffectsEnabled: serializer.fromJson<bool>(
+        json['isSoundEffectsEnabled'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'isMusicEnabled': serializer.toJson<bool>(isMusicEnabled),
+      'isSoundEffectsEnabled': serializer.toJson<bool>(isSoundEffectsEnabled),
+    };
+  }
+
+  AudioSetting copyWith({
+    int? id,
+    bool? isMusicEnabled,
+    bool? isSoundEffectsEnabled,
+  }) => AudioSetting(
+    id: id ?? this.id,
+    isMusicEnabled: isMusicEnabled ?? this.isMusicEnabled,
+    isSoundEffectsEnabled: isSoundEffectsEnabled ?? this.isSoundEffectsEnabled,
+  );
+  AudioSetting copyWithCompanion(AudioSettingsCompanion data) {
+    return AudioSetting(
+      id: data.id.present ? data.id.value : this.id,
+      isMusicEnabled: data.isMusicEnabled.present
+          ? data.isMusicEnabled.value
+          : this.isMusicEnabled,
+      isSoundEffectsEnabled: data.isSoundEffectsEnabled.present
+          ? data.isSoundEffectsEnabled.value
+          : this.isSoundEffectsEnabled,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AudioSetting(')
+          ..write('id: $id, ')
+          ..write('isMusicEnabled: $isMusicEnabled, ')
+          ..write('isSoundEffectsEnabled: $isSoundEffectsEnabled')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, isMusicEnabled, isSoundEffectsEnabled);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AudioSetting &&
+          other.id == this.id &&
+          other.isMusicEnabled == this.isMusicEnabled &&
+          other.isSoundEffectsEnabled == this.isSoundEffectsEnabled);
+}
+
+class AudioSettingsCompanion extends UpdateCompanion<AudioSetting> {
+  final Value<int> id;
+  final Value<bool> isMusicEnabled;
+  final Value<bool> isSoundEffectsEnabled;
+  const AudioSettingsCompanion({
+    this.id = const Value.absent(),
+    this.isMusicEnabled = const Value.absent(),
+    this.isSoundEffectsEnabled = const Value.absent(),
+  });
+  AudioSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    this.isMusicEnabled = const Value.absent(),
+    this.isSoundEffectsEnabled = const Value.absent(),
+  });
+  static Insertable<AudioSetting> custom({
+    Expression<int>? id,
+    Expression<bool>? isMusicEnabled,
+    Expression<bool>? isSoundEffectsEnabled,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (isMusicEnabled != null) 'is_music_enabled': isMusicEnabled,
+      if (isSoundEffectsEnabled != null)
+        'is_sound_effects_enabled': isSoundEffectsEnabled,
+    });
+  }
+
+  AudioSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<bool>? isMusicEnabled,
+    Value<bool>? isSoundEffectsEnabled,
+  }) {
+    return AudioSettingsCompanion(
+      id: id ?? this.id,
+      isMusicEnabled: isMusicEnabled ?? this.isMusicEnabled,
+      isSoundEffectsEnabled:
+          isSoundEffectsEnabled ?? this.isSoundEffectsEnabled,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (isMusicEnabled.present) {
+      map['is_music_enabled'] = Variable<bool>(isMusicEnabled.value);
+    }
+    if (isSoundEffectsEnabled.present) {
+      map['is_sound_effects_enabled'] = Variable<bool>(
+        isSoundEffectsEnabled.value,
+      );
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AudioSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('isMusicEnabled: $isMusicEnabled, ')
+          ..write('isSoundEffectsEnabled: $isSoundEffectsEnabled')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $HighScoresTable highScores = $HighScoresTable(this);
   late final $GameStatesTable gameStates = $GameStatesTable(this);
+  late final $AudioSettingsTable audioSettings = $AudioSettingsTable(this);
   late final GameStateDao gameStateDao = GameStateDao(this as AppDatabase);
   late final HighScoreDao highScoreDao = HighScoreDao(this as AppDatabase);
+  late final AudioSettingsDao audioSettingsDao = AudioSettingsDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [highScores, gameStates];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    highScores,
+    gameStates,
+    audioSettings,
+  ];
 }
 
 typedef $$HighScoresTableCreateCompanionBuilder =
@@ -798,6 +1088,166 @@ typedef $$GameStatesTableProcessedTableManager =
       GameState,
       PrefetchHooks Function()
     >;
+typedef $$AudioSettingsTableCreateCompanionBuilder =
+    AudioSettingsCompanion Function({
+      Value<int> id,
+      Value<bool> isMusicEnabled,
+      Value<bool> isSoundEffectsEnabled,
+    });
+typedef $$AudioSettingsTableUpdateCompanionBuilder =
+    AudioSettingsCompanion Function({
+      Value<int> id,
+      Value<bool> isMusicEnabled,
+      Value<bool> isSoundEffectsEnabled,
+    });
+
+class $$AudioSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $AudioSettingsTable> {
+  $$AudioSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isMusicEnabled => $composableBuilder(
+    column: $table.isMusicEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isSoundEffectsEnabled => $composableBuilder(
+    column: $table.isSoundEffectsEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AudioSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AudioSettingsTable> {
+  $$AudioSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isMusicEnabled => $composableBuilder(
+    column: $table.isMusicEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isSoundEffectsEnabled => $composableBuilder(
+    column: $table.isSoundEffectsEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AudioSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AudioSettingsTable> {
+  $$AudioSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<bool> get isMusicEnabled => $composableBuilder(
+    column: $table.isMusicEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isSoundEffectsEnabled => $composableBuilder(
+    column: $table.isSoundEffectsEnabled,
+    builder: (column) => column,
+  );
+}
+
+class $$AudioSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AudioSettingsTable,
+          AudioSetting,
+          $$AudioSettingsTableFilterComposer,
+          $$AudioSettingsTableOrderingComposer,
+          $$AudioSettingsTableAnnotationComposer,
+          $$AudioSettingsTableCreateCompanionBuilder,
+          $$AudioSettingsTableUpdateCompanionBuilder,
+          (
+            AudioSetting,
+            BaseReferences<_$AppDatabase, $AudioSettingsTable, AudioSetting>,
+          ),
+          AudioSetting,
+          PrefetchHooks Function()
+        > {
+  $$AudioSettingsTableTableManager(_$AppDatabase db, $AudioSettingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AudioSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AudioSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AudioSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<bool> isMusicEnabled = const Value.absent(),
+                Value<bool> isSoundEffectsEnabled = const Value.absent(),
+              }) => AudioSettingsCompanion(
+                id: id,
+                isMusicEnabled: isMusicEnabled,
+                isSoundEffectsEnabled: isSoundEffectsEnabled,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<bool> isMusicEnabled = const Value.absent(),
+                Value<bool> isSoundEffectsEnabled = const Value.absent(),
+              }) => AudioSettingsCompanion.insert(
+                id: id,
+                isMusicEnabled: isMusicEnabled,
+                isSoundEffectsEnabled: isSoundEffectsEnabled,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AudioSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AudioSettingsTable,
+      AudioSetting,
+      $$AudioSettingsTableFilterComposer,
+      $$AudioSettingsTableOrderingComposer,
+      $$AudioSettingsTableAnnotationComposer,
+      $$AudioSettingsTableCreateCompanionBuilder,
+      $$AudioSettingsTableUpdateCompanionBuilder,
+      (
+        AudioSetting,
+        BaseReferences<_$AppDatabase, $AudioSettingsTable, AudioSetting>,
+      ),
+      AudioSetting,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -806,6 +1256,8 @@ class $AppDatabaseManager {
       $$HighScoresTableTableManager(_db, _db.highScores);
   $$GameStatesTableTableManager get gameStates =>
       $$GameStatesTableTableManager(_db, _db.gameStates);
+  $$AudioSettingsTableTableManager get audioSettings =>
+      $$AudioSettingsTableTableManager(_db, _db.audioSettings);
 }
 
 mixin _$GameStateDaoMixin on DatabaseAccessor<AppDatabase> {
@@ -813,4 +1265,7 @@ mixin _$GameStateDaoMixin on DatabaseAccessor<AppDatabase> {
 }
 mixin _$HighScoreDaoMixin on DatabaseAccessor<AppDatabase> {
   $HighScoresTable get highScores => attachedDatabase.highScores;
+}
+mixin _$AudioSettingsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $AudioSettingsTable get audioSettings => attachedDatabase.audioSettings;
 }

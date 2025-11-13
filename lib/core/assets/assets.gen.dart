@@ -14,6 +14,9 @@ import 'package:flutter/widgets.dart';
 class $AssetsAudioGen {
   const $AssetsAudioGen();
 
+  /// File path: assets/audio/background.mp3
+  String get background => 'assets/audio/background.mp3';
+
   /// File path: assets/audio/merge.mp3
   String get merge => 'assets/audio/merge.mp3';
 
@@ -21,7 +24,7 @@ class $AssetsAudioGen {
   String get move => 'assets/audio/move.mp3';
 
   /// List of all assets
-  List<String> get values => [merge, move];
+  List<String> get values => [background, merge, move];
 }
 
 class $AssetsImagesGen {

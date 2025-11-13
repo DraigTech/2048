@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:draig_2048/core/audio/audio_manager.dart';
 import 'package:draig_2048/features/game/domain/entities/game_board.dart';
 import 'package:draig_2048/features/game/domain/entities/high_score.dart';
 import 'package:draig_2048/features/game/domain/entities/tile.dart';
@@ -17,6 +18,7 @@ import 'package:mockito/mockito.dart';
 import 'game_bloc_test.mocks.dart';
 
 @GenerateMocks([
+  AudioManager,
   MoveTilesUseCase,
   GameRepository,
   GetHighScoreUseCase,
@@ -25,6 +27,7 @@ import 'game_bloc_test.mocks.dart';
 ])
 void main() {
   late GameBloc gameBloc;
+  late AudioManager audioManager;
   late MockMoveTilesUseCase mockMoveTilesUseCase;
   late MockGameRepository mockGameRepository;
   late MockGetHighScoreUseCase mockGetHighScoreUseCase;
@@ -83,6 +86,7 @@ void main() {
           return null;
         });
 
+    audioManager = MockAudioManager();
     mockMoveTilesUseCase = MockMoveTilesUseCase();
     mockGameRepository = MockGameRepository();
     mockGetHighScoreUseCase = MockGetHighScoreUseCase();
@@ -90,6 +94,7 @@ void main() {
     mockCheckGameOverUseCase = MockCheckGameOverUseCase();
 
     gameBloc = GameBloc(
+      audioManager: audioManager,
       moveTiles: mockMoveTilesUseCase,
       repository: mockGameRepository,
       getHighScore: mockGetHighScoreUseCase,
@@ -205,7 +210,7 @@ void main() {
         GameLoaded(tMovedBoard, highScore: tMovedBoard.score),
         GameLoaded(
           tMovedBoard,
-          highScore:  tMovedBoard.score,
+          highScore: tMovedBoard.score,
           isGameOver: true,
         ),
       ],
@@ -304,6 +309,29 @@ void main() {
       expect: () => <GameState>[], // No state change expected for SaveGameEvent
       verify: (_) {
         verify(mockGameRepository.saveBoard(tInitialBoard)).called(1);
+      },
+    );
+
+    blocTest<GameBloc, GameState>(
+      'should trigger NewGameEvent when GameResetEvent is added',
+      build: () {
+        when(
+          mockGameRepository.newGame(),
+        ).thenAnswer((_) async => tInitialBoard);
+        when(
+          mockGetHighScoreUseCase.call(),
+        ).thenAnswer((_) async => tHighScore);
+        when(mockGameRepository.clearBoard()).thenAnswer((_) async => {});
+        return gameBloc;
+      },
+      act: (bloc) => bloc.add(GameResetEvent()),
+      expect: () => [
+        GameLoaded(tInitialBoard, highScore: tHighScore.score),
+      ],
+      verify: (_) {
+        verify(mockGameRepository.newGame()).called(1);
+        verify(mockGameRepository.clearBoard()).called(1);
+        verify(mockGetHighScoreUseCase.call()).called(1);
       },
     );
   });

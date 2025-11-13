@@ -17,7 +17,7 @@ This guide provides a high-level overview of the steps required to implement the
 2.  **Generate Code**: Run `dart run build_runner build --delete-conflicting-outputs` to generate the necessary Drift table info and DAO classes.
 3.  **Create Repository**: Create `lib/features/settings/data/settings_repository.dart`.
     -   It should take the database as a dependency.
-    -   Implement methods like `Future<AudioSettings> getSettings()` and `Future<void> saveSettings(AudioSettings settings)`.
+    -   Implement methods like `Stream<AudioSettings> getSettings()` and `Future<void> saveSettings(AudioSettings settings)`.
 
 ## 3. State Management (BLoC)
 

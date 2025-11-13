@@ -32,3 +32,6 @@ class NewGameEvent extends GameEvent {}
 
 /// Event to trigger saving the current game state.
 class SaveGameEvent extends GameEvent {}
+
+/// Event to reset the game to a new state.
+class GameResetEvent extends GameEvent {}

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:draig_2048/core/assets/assets.gen.dart';
+import 'package:draig_2048/core/audio/audio_manager.dart';
 import 'package:draig_2048/features/game/domain/entities/game_board.dart';
 import 'package:draig_2048/features/game/domain/entities/high_score.dart';
 import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
@@ -10,7 +11,6 @@ import 'package:draig_2048/features/game/domain/usecases/get_high_score.dart';
 import 'package:draig_2048/features/game/domain/usecases/move_tiles.dart';
 import 'package:draig_2048/features/game/domain/usecases/save_high_score.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flame_audio/flame_audio.dart';
 
 part 'game_event.dart';
 part 'game_state.dart';
@@ -24,6 +24,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   ///
   /// Requires various use cases and a [GameRepository] for its operations.
   GameBloc({
+    required this.audioManager,
     required this.moveTiles,
     required this.repository,
     required this.getHighScore,
@@ -35,7 +36,11 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<CheckGameOverEvent>(_onCheckGameOver);
     on<NewGameEvent>(_onNewGame);
     on<SaveGameEvent>(_onSaveGame);
+    on<GameResetEvent>((event, emit) => add(NewGameEvent()));
   }
+
+  /// Audio manager for playing sound effects.
+  final AudioManager audioManager;
 
   /// Use case for moving tiles on the game board.
   final MoveTilesUseCase moveTiles;
@@ -52,9 +57,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   /// Use case for checking if the game is over.
   final CheckGameOverUseCase checkGameOver;
 
-  AudioPool? _moveAudio;
-  AudioPool? _mergeAudio;
-
   /// Handles the [GameStartEvent] to initialize the game and load audio assets.
   Future<void> _onGameStarted(
     GameStartEvent event,
@@ -68,14 +70,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       } else {
         add(NewGameEvent());
       }
-      _moveAudio = await FlameAudio.createPool(
-        Assets.audio.move,
-        maxPlayers: 1,
-      );
-      _mergeAudio = await FlameAudio.createPool(
-        Assets.audio.merge,
-        maxPlayers: 1,
-      );
     } on Exception catch (e) {
       emit(GameError(e.toString()));
     }
@@ -97,9 +91,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       if (newBoard != currentBoard) {
         if (merged) {
-          unawaited(_mergeAudio?.start());
+          audioManager.playSoundEffect(Assets.audio.merge);
         }
-        unawaited(_moveAudio?.start());
+        audioManager.playSoundEffect(Assets.audio.move);
       }
 
       var updatedHighScore = currentHighScore;
