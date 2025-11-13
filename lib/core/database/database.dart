@@ -1,5 +1,5 @@
-import 'package:draig_2048/features/game/data/datasources/local/tables/game_states.dart';
-import 'package:draig_2048/features/game/data/datasources/local/tables/high_scores.dart';
+import 'package:draig_2048/core/database/tables/game_states.dart';
+import 'package:draig_2048/core/database/tables/high_scores.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';

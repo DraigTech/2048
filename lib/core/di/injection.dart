@@ -1,4 +1,4 @@
-import 'package:draig_2048/features/game/data/datasources/local/database.dart';
+import 'package:draig_2048/core/database/database.dart';
 import 'package:draig_2048/features/game/data/repositories/game_repository_impl.dart';
 import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
 import 'package:draig_2048/features/game/domain/usecases/check_game_over.dart';

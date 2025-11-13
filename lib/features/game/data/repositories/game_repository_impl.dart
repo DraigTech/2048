@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:draig_2048/features/game/data/datasources/local/database.dart'
+import 'package:draig_2048/core/database/database.dart'
     as db;
 import 'package:draig_2048/features/game/domain/entities/game_board.dart';
 import 'package:draig_2048/features/game/domain/entities/high_score.dart';
