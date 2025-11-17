@@ -42,5 +42,21 @@
   "retry": "Retry",
   "@retry": {
     "description": "Button text to retry"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Button text to close"
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "The title of the settings screen"
+  },
+  "backgroundMusic": "Background Music",
+  "@backgroundMusic": {
+    "description": "Label for background music setting"
+  },
+  "soundEffects": "Sound Effects",
+  "@soundEffects": {
+    "description": "Label for sound effects setting"
   }
 }

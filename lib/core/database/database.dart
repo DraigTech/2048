@@ -1,17 +1,19 @@
-import 'package:draig_2048/features/game/data/datasources/local/tables/game_states.dart';
-import 'package:draig_2048/features/game/data/datasources/local/tables/high_scores.dart';
+import 'package:draig_2048/core/database/tables/audio_settings.dart';
+import 'package:draig_2048/core/database/tables/game_states.dart';
+import 'package:draig_2048/core/database/tables/high_scores.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+part 'daos/audio_settings_dao.dart';
 part 'daos/game_state_dao.dart';
 part 'daos/high_score_dao.dart';
 part 'database.g.dart';
 
 /// The main database class.
 @DriftDatabase(
-  tables: [HighScores, GameStates],
-  daos: [GameStateDao, HighScoreDao],
+  tables: [HighScores, GameStates, AudioSettings],
+  daos: [GameStateDao, HighScoreDao, AudioSettingsDao],
 )
 class AppDatabase extends _$AppDatabase {
   /// Creates an instance of [AppDatabase].

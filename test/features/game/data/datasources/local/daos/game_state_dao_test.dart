@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:draig_2048/features/game/data/datasources/local/database.dart';
+import 'package:draig_2048/core/database/database.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
