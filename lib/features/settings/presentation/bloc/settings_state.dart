@@ -1,6 +1,6 @@
 part of 'settings_bloc.dart';
 
-/// Abstract base class for all states in the [SettingsBloc].
+/// Sealed base class for all states in the [SettingsBloc].
 sealed class SettingsState extends Equatable {
   /// Creates an instance of [SettingsState].
   const SettingsState();
