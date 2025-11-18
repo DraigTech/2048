@@ -20,6 +20,7 @@ class GameLoaded extends GameState {
     this.gameBoard, {
     required this.highScore,
     this.isGameOver = false,
+    this.boardSize = 4,
   });
 
   /// The current state of the game board.
@@ -31,8 +32,11 @@ class GameLoaded extends GameState {
   /// Indicates whether the game is over.
   final bool isGameOver;
 
+  /// The size of the game board.
+  final int boardSize;
+
   @override
-  List<Object> get props => [gameBoard, highScore, isGameOver];
+  List<Object> get props => [gameBoard, highScore, isGameOver, boardSize];
 }
 
 

@@ -16,6 +16,9 @@ class GameStates extends Table {
   /// The timestamp when the state was saved.
   DateTimeColumn get createdAt => dateTime()();
 
+  /// The grid size of the board when this game state was saved.
+  IntColumn get boardSize => integer().withDefault(const Constant(4))();
+
   @override
   Set<Column> get primaryKey => {id};
 }

@@ -12,7 +12,7 @@ class SaveHighScoreUseCase {
   /// Executes the use case to save the given [highScore].
   ///
   /// Returns a [Future] that completes when the high score is saved.
-  Future<void> call(HighScore highScore) {
-    return repository.saveHighScore(highScore);
+  Future<void> call(HighScore highScore, int boardSize) {
+    return repository.saveHighScore(highScore, boardSize);
   }
 }

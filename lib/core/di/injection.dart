@@ -3,14 +3,21 @@ import 'package:draig_2048/core/database/database.dart';
 import 'package:draig_2048/features/game/data/repositories/game_repository_impl.dart';
 import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
 import 'package:draig_2048/features/game/domain/usecases/check_game_over.dart';
+import 'package:draig_2048/features/game/domain/usecases/clear_board.dart';
 import 'package:draig_2048/features/game/domain/usecases/get_high_score.dart';
+import 'package:draig_2048/features/game/domain/usecases/load_board.dart';
 import 'package:draig_2048/features/game/domain/usecases/move_tiles.dart';
+import 'package:draig_2048/features/game/domain/usecases/new_game.dart';
+import 'package:draig_2048/features/game/domain/usecases/save_board.dart';
 import 'package:draig_2048/features/game/domain/usecases/save_high_score.dart';
 import 'package:draig_2048/features/game/presentation/bloc/game_bloc.dart';
 import 'package:draig_2048/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:draig_2048/features/settings/domain/repositories/settings_repository.dart';
 import 'package:draig_2048/features/settings/domain/usecases/get_audio_settings.dart';
+import 'package:draig_2048/features/settings/domain/usecases/get_game_mode.dart';
 import 'package:draig_2048/features/settings/domain/usecases/save_audio_settings.dart';
+import 'package:draig_2048/features/settings/domain/usecases/save_game_mode.dart';
+import 'package:draig_2048/features/settings/domain/usecases/watch_game_mode.dart';
 import 'package:draig_2048/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:get_it/get_it.dart';
 
@@ -36,6 +43,8 @@ void _configureDatabase() {
     ..registerSingleton<HighScoreDao>(getIt<AppDatabase>().highScoreDao)
     ..registerSingleton<AudioSettingsDao>(
       getIt<AppDatabase>().audioSettingsDao,
+    )..registerSingleton(
+      getIt<AppDatabase>().gameModeSettingsDao,
     );
 }
 
@@ -45,7 +54,7 @@ void _configureRepositories() {
       () => GameRepositoryImpl(getIt(), getIt()),
     )
     ..registerLazySingleton<SettingsRepository>(
-      () => SettingsRepositoryImpl(getIt()),
+      () => SettingsRepositoryImpl(getIt(), getIt()),
     );
 }
 
@@ -56,7 +65,14 @@ void _configureUseCases() {
     ..registerLazySingleton(() => SaveHighScoreUseCase(getIt()))
     ..registerLazySingleton(() => CheckGameOverUseCase(getIt()))
     ..registerLazySingleton(() => GetAudioSettingsUseCase(getIt()))
-    ..registerLazySingleton(() => SaveAudioSettingsUseCase(getIt()));
+    ..registerLazySingleton(() => SaveAudioSettingsUseCase(getIt()))
+    ..registerLazySingleton(() => WatchGameModeUseCase(getIt()))
+    ..registerLazySingleton(() => GetGameModeUseCase(getIt()))
+    ..registerLazySingleton(() => SaveGameModeUseCase(getIt()))
+    ..registerLazySingleton(() => LoadBoardUseCase(getIt()))
+    ..registerLazySingleton(() => SaveBoardUseCase(getIt()))
+    ..registerLazySingleton(() => ClearBoardUseCase(getIt()))
+    ..registerLazySingleton(() => NewGameUseCase(getIt()));
 }
 
 void _configureBlocs() {
@@ -65,16 +81,23 @@ void _configureBlocs() {
       () => GameBloc(
         audioManager: getIt(),
         moveTiles: getIt(),
-        repository: getIt(),
         getHighScore: getIt(),
         saveHighScore: getIt(),
         checkGameOver: getIt(),
+        loadBoard: getIt(),
+        newGame: getIt(),
+        saveBoard: getIt(),
+        clearBoard: getIt(),
+        getGameMode: getIt(),
+        watchGameMode: getIt(),
       ),
     )
     ..registerFactory(
       () => SettingsBloc(
         getAudioSettings: getIt(),
         saveAudioSettings: getIt(),
+        getGameMode: getIt(),
+        saveGameMode: getIt(),
       ),
     );
 }

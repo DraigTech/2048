@@ -12,7 +12,7 @@ class GetHighScoreUseCase {
   /// Executes the use case to retrieve the high score.
   ///
   /// Returns a [Future] that completes with a [HighScore] object.
-  Future<HighScore> call() {
-    return repository.getHighScore();
+  Future<HighScore> call(int boardSize) {
+    return repository.getHighScore(boardSize);
   }
 }

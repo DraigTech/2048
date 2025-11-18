@@ -38,3 +38,15 @@ class ToggleSoundEffects extends SettingsEvent {
   @override
   List<Object> get props => [isSoundEffectsEnabled];
 }
+
+/// Event to change the game mode.
+class ChangeGameMode extends SettingsEvent {
+  /// Creates an instance of [ChangeGameMode].
+  const ChangeGameMode({required this.gameMode});
+
+  /// The new game mode.
+  final GameMode gameMode;
+
+  @override
+  List<Object> get props => [gameMode];
+}

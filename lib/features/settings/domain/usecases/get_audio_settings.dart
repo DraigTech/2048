@@ -3,14 +3,14 @@ import 'package:draig_2048/features/settings/domain/repositories/settings_reposi
 
 /// A use case for getting audio settings.
 class GetAudioSettingsUseCase {
-  /// Creates a [GetAudioSettingsUseCase] with the given [repository].
-  GetAudioSettingsUseCase(this.repository);
+  /// Creates a [GetAudioSettingsUseCase] with the given [SettingsRepository].
+  GetAudioSettingsUseCase(this._repository);
 
   /// The [SettingsRepository] to interact with.
-  final SettingsRepository repository;
+  final SettingsRepository _repository;
 
   /// Retrieves the current [AudioSettings].
   Stream<AudioSettings> call() {
-    return repository.getAudioSettings();
+    return _repository.getAudioSettings();
   }
 }

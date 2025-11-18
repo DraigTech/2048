@@ -48,7 +48,7 @@ class GameStates extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get board => text()();
   IntColumn get score => integer()();
-  BoolColumn get isGameOver => boolean()();
+  DateTimeColumn get createdAt => dateTime()();
   
   // New column
   IntColumn get boardSize => integer().withDefault(const Constant(4))();

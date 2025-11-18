@@ -8,6 +8,7 @@ class GameBoardWidget extends StatelessWidget {
   const GameBoardWidget({
     required this.gameBoard,
     required this.gameBoardSize,
+    required this.gridSize,
     super.key,
   });
 
@@ -17,10 +18,12 @@ class GameBoardWidget extends StatelessWidget {
   /// The size (width and height) of the game board.
   final double gameBoardSize;
 
+  /// The number of tiles in a row/column of the game board.
+  final int gridSize;
+
   @override
   Widget build(BuildContext context) {
     const double spacing = 4;
-    const double gridSize = 4;
     final tileSize = (gameBoardSize - spacing * (gridSize + 1)) / gridSize;
 
     final tileWidgets = <Widget>[];
@@ -55,12 +58,12 @@ class GameBoardWidget extends StatelessWidget {
             child: GridView.builder(
               scrollDirection: Axis.horizontal,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: gridSize,
                 crossAxisSpacing: spacing,
                 mainAxisSpacing: spacing,
               ),
-              itemCount: 16,
+              itemCount: gridSize * gridSize,
               itemBuilder: (context, index) {
                 return Container(
                   decoration: BoxDecoration(

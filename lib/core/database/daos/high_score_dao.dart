@@ -8,8 +8,10 @@ class HighScoreDao extends DatabaseAccessor<AppDatabase>
   HighScoreDao(super.attachedDatabase);
 
   /// Retrieves the highest score from the database.
-  Future<HighScore?> getHighScore() =>
-      (select(highScores)..orderBy([(t) => OrderingTerm.desc(t.score)]))
+  Future<HighScore?> getHighScore(int boardSize) =>
+      (select(highScores)
+            ..where((t) => t.boardSize.equals(boardSize))
+            ..limit(1))
           .getSingleOrNull();
 
   /// Saves or updates a high score.

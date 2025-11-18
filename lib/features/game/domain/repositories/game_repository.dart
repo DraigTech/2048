@@ -9,7 +9,7 @@ import 'package:draig_2048/features/game/domain/entities/high_score.dart';
 /// and managing high scores.
 abstract class GameRepository {
   /// Starts a new game, returning the initial [GameBoard].
-  Future<GameBoard> newGame();
+  Future<GameBoard> newGame(int boardSize);
 
   /// Moves tiles on the [board] in the specified [direction].
   ///
@@ -22,19 +22,19 @@ abstract class GameRepository {
   /// Returns `true` if the game is over, `false` otherwise.
   Future<bool> isGameOver(GameBoard board);
 
-  /// Retrieves the highest score recorded.
-  Future<HighScore> getHighScore();
+  /// Retrieves the highest score recorded for a specific [boardSize].
+  Future<HighScore> getHighScore(int boardSize);
 
-  /// Saves the given [highScore].
-  Future<void> saveHighScore(HighScore highScore);
+  /// Saves the given [highScore] for a specific [boardSize].
+  Future<void> saveHighScore(HighScore highScore, int boardSize);
 
-  /// Loads the saved game board from persistence.
+  /// Loads the saved game board from persistence for a specific [boardSize].
   ///
   /// Returns the saved [GameBoard] or `null` if no saved game exists.
-  Future<GameBoard?> loadBoard();
+  Future<GameBoard?> loadBoard(int boardSize);
 
-  /// Saves the current [board] to persistence.
-  Future<void> saveBoard(GameBoard board);
+  /// Saves the current [board] to persistence for a specific [boardSize].
+  Future<void> saveBoard(GameBoard board, int boardSize);
 
   /// Clears the saved game board from persistence.
   Future<void> clearBoard();
