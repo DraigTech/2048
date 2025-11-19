@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:draig_2048/core/di/injection.dart';
 import 'package:draig_2048/core/di/providers.dart';
 import 'package:draig_2048/core/l10n/app_localizations.dart';

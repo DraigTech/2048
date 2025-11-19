@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:draig_2048/core/ads/ad_service.dart';
 import 'package:draig_2048/core/assets/assets.gen.dart';
 import 'package:draig_2048/core/audio/audio_manager.dart';
 import 'package:draig_2048/features/game/domain/entities/game_board.dart';
@@ -41,6 +42,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     required this.clearBoard,
     required this.getGameMode,
     required this.watchGameMode,
+    required this.adsService,
   }) : super(GameInitial()) {
     on<GameStartEvent>(_onGameStarted);
     on<GameMoveEvent>(_onGameMoved);
@@ -49,6 +51,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<SaveGameEvent>(_onSaveGame);
     on<GameResetEvent>((event, emit) => add(NewGameEvent()));
   }
+
+  /// Manages ads.
+  final AdService adsService;
 
   /// Audio manager for playing sound effects.
   final AudioManager audioManager;
@@ -109,7 +114,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
             .listen(
               (event) => add(NewGameEvent()),
             );
-      } else {
+      }
+ else {
         add(NewGameEvent());
       }
     } on Exception catch (e) {
@@ -172,6 +178,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       final currentState = state as GameLoaded;
       final isGameOver = await checkGameOver(currentState.gameBoard);
       if (isGameOver) {
+        adsService.showInterstitialAd();
         emit(
           GameLoaded(
             currentState.gameBoard,

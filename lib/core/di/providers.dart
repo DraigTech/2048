@@ -1,7 +1,9 @@
+import 'package:draig_2048/core/ads/ad_service.dart';
 import 'package:draig_2048/core/di/injection.dart';
 import 'package:draig_2048/features/game/presentation/bloc/game_bloc.dart';
 import 'package:draig_2048/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 /// Provides a list of [SingleChildWidget] for the application's BLoC providers.
@@ -10,6 +12,9 @@ import 'package:provider/single_child_widget.dart';
 /// accessed throughout the widget tree.
 List<SingleChildWidget> get appProviders {
   return [
+    Provider<AdService>(
+      create: (context) => getIt<AdService>(),
+    ),
     BlocProvider<GameBloc>(
       create: (context) => getIt<GameBloc>(),
     ),
