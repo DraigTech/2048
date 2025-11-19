@@ -9,16 +9,6 @@ class $HighScoresTable extends HighScores
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $HighScoresTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(1),
-  );
   static const VerificationMeta _scoreMeta = const VerificationMeta('score');
   @override
   late final GeneratedColumn<int> score = GeneratedColumn<int>(
@@ -28,8 +18,19 @@ class $HighScoresTable extends HighScores
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _boardSizeMeta = const VerificationMeta(
+    'boardSize',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, score];
+  late final GeneratedColumn<int> boardSize = GeneratedColumn<int>(
+    'board_size',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [score, boardSize];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -42,9 +43,6 @@ class $HighScoresTable extends HighScores
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
     if (data.containsKey('score')) {
       context.handle(
         _scoreMeta,
@@ -53,22 +51,28 @@ class $HighScoresTable extends HighScores
     } else if (isInserting) {
       context.missing(_scoreMeta);
     }
+    if (data.containsKey('board_size')) {
+      context.handle(
+        _boardSizeMeta,
+        boardSize.isAcceptableOrUnknown(data['board_size']!, _boardSizeMeta),
+      );
+    }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {id};
+  Set<GeneratedColumn> get $primaryKey => {boardSize};
   @override
   HighScore map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return HighScore(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
       score: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}score'],
+      )!,
+      boardSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}board_size'],
       )!,
     );
   }
@@ -80,23 +84,25 @@ class $HighScoresTable extends HighScores
 }
 
 class HighScore extends DataClass implements Insertable<HighScore> {
-  /// The ID of the high score entry.
-  /// Defaults to 1, ensuring a single entry for the high score.
-  final int id;
-
   /// The score achieved in the game.
   final int score;
-  const HighScore({required this.id, required this.score});
+
+  /// The board size associated with the high score.
+  final int boardSize;
+  const HighScore({required this.score, required this.boardSize});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
     map['score'] = Variable<int>(score);
+    map['board_size'] = Variable<int>(boardSize);
     return map;
   }
 
   HighScoresCompanion toCompanion(bool nullToAbsent) {
-    return HighScoresCompanion(id: Value(id), score: Value(score));
+    return HighScoresCompanion(
+      score: Value(score),
+      boardSize: Value(boardSize),
+    );
   }
 
   factory HighScore.fromJson(
@@ -105,78 +111,85 @@ class HighScore extends DataClass implements Insertable<HighScore> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return HighScore(
-      id: serializer.fromJson<int>(json['id']),
       score: serializer.fromJson<int>(json['score']),
+      boardSize: serializer.fromJson<int>(json['boardSize']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
       'score': serializer.toJson<int>(score),
+      'boardSize': serializer.toJson<int>(boardSize),
     };
   }
 
-  HighScore copyWith({int? id, int? score}) =>
-      HighScore(id: id ?? this.id, score: score ?? this.score);
+  HighScore copyWith({int? score, int? boardSize}) => HighScore(
+    score: score ?? this.score,
+    boardSize: boardSize ?? this.boardSize,
+  );
   HighScore copyWithCompanion(HighScoresCompanion data) {
     return HighScore(
-      id: data.id.present ? data.id.value : this.id,
       score: data.score.present ? data.score.value : this.score,
+      boardSize: data.boardSize.present ? data.boardSize.value : this.boardSize,
     );
   }
 
   @override
   String toString() {
     return (StringBuffer('HighScore(')
-          ..write('id: $id, ')
-          ..write('score: $score')
+          ..write('score: $score, ')
+          ..write('boardSize: $boardSize')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, score);
+  int get hashCode => Object.hash(score, boardSize);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is HighScore && other.id == this.id && other.score == this.score);
+      (other is HighScore &&
+          other.score == this.score &&
+          other.boardSize == this.boardSize);
 }
 
 class HighScoresCompanion extends UpdateCompanion<HighScore> {
-  final Value<int> id;
   final Value<int> score;
+  final Value<int> boardSize;
   const HighScoresCompanion({
-    this.id = const Value.absent(),
     this.score = const Value.absent(),
+    this.boardSize = const Value.absent(),
   });
   HighScoresCompanion.insert({
-    this.id = const Value.absent(),
     required int score,
+    this.boardSize = const Value.absent(),
   }) : score = Value(score);
   static Insertable<HighScore> custom({
-    Expression<int>? id,
     Expression<int>? score,
+    Expression<int>? boardSize,
   }) {
     return RawValuesInsertable({
-      if (id != null) 'id': id,
       if (score != null) 'score': score,
+      if (boardSize != null) 'board_size': boardSize,
     });
   }
 
-  HighScoresCompanion copyWith({Value<int>? id, Value<int>? score}) {
-    return HighScoresCompanion(id: id ?? this.id, score: score ?? this.score);
+  HighScoresCompanion copyWith({Value<int>? score, Value<int>? boardSize}) {
+    return HighScoresCompanion(
+      score: score ?? this.score,
+      boardSize: boardSize ?? this.boardSize,
+    );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
     if (score.present) {
       map['score'] = Variable<int>(score.value);
+    }
+    if (boardSize.present) {
+      map['board_size'] = Variable<int>(boardSize.value);
     }
     return map;
   }
@@ -184,8 +197,8 @@ class HighScoresCompanion extends UpdateCompanion<HighScore> {
   @override
   String toString() {
     return (StringBuffer('HighScoresCompanion(')
-          ..write('id: $id, ')
-          ..write('score: $score')
+          ..write('score: $score, ')
+          ..write('boardSize: $boardSize')
           ..write(')'))
         .toString();
   }
@@ -236,8 +249,26 @@ class $GameStatesTable extends GameStates
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _boardSizeMeta = const VerificationMeta(
+    'boardSize',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, board, score, createdAt];
+  late final GeneratedColumn<int> boardSize = GeneratedColumn<int>(
+    'board_size',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(4),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    board,
+    score,
+    createdAt,
+    boardSize,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -277,6 +308,12 @@ class $GameStatesTable extends GameStates
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('board_size')) {
+      context.handle(
+        _boardSizeMeta,
+        boardSize.isAcceptableOrUnknown(data['board_size']!, _boardSizeMeta),
+      );
+    }
     return context;
   }
 
@@ -302,6 +339,10 @@ class $GameStatesTable extends GameStates
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      boardSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}board_size'],
+      )!,
     );
   }
 
@@ -324,11 +365,15 @@ class GameState extends DataClass implements Insertable<GameState> {
 
   /// The timestamp when the state was saved.
   final DateTime createdAt;
+
+  /// The grid size of the board when this game state was saved.
+  final int boardSize;
   const GameState({
     required this.id,
     required this.board,
     required this.score,
     required this.createdAt,
+    required this.boardSize,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -337,6 +382,7 @@ class GameState extends DataClass implements Insertable<GameState> {
     map['board'] = Variable<String>(board);
     map['score'] = Variable<int>(score);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['board_size'] = Variable<int>(boardSize);
     return map;
   }
 
@@ -346,6 +392,7 @@ class GameState extends DataClass implements Insertable<GameState> {
       board: Value(board),
       score: Value(score),
       createdAt: Value(createdAt),
+      boardSize: Value(boardSize),
     );
   }
 
@@ -359,6 +406,7 @@ class GameState extends DataClass implements Insertable<GameState> {
       board: serializer.fromJson<String>(json['board']),
       score: serializer.fromJson<int>(json['score']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      boardSize: serializer.fromJson<int>(json['boardSize']),
     );
   }
   @override
@@ -369,6 +417,7 @@ class GameState extends DataClass implements Insertable<GameState> {
       'board': serializer.toJson<String>(board),
       'score': serializer.toJson<int>(score),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'boardSize': serializer.toJson<int>(boardSize),
     };
   }
 
@@ -377,11 +426,13 @@ class GameState extends DataClass implements Insertable<GameState> {
     String? board,
     int? score,
     DateTime? createdAt,
+    int? boardSize,
   }) => GameState(
     id: id ?? this.id,
     board: board ?? this.board,
     score: score ?? this.score,
     createdAt: createdAt ?? this.createdAt,
+    boardSize: boardSize ?? this.boardSize,
   );
   GameState copyWithCompanion(GameStatesCompanion data) {
     return GameState(
@@ -389,6 +440,7 @@ class GameState extends DataClass implements Insertable<GameState> {
       board: data.board.present ? data.board.value : this.board,
       score: data.score.present ? data.score.value : this.score,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      boardSize: data.boardSize.present ? data.boardSize.value : this.boardSize,
     );
   }
 
@@ -398,13 +450,14 @@ class GameState extends DataClass implements Insertable<GameState> {
           ..write('id: $id, ')
           ..write('board: $board, ')
           ..write('score: $score, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('boardSize: $boardSize')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, board, score, createdAt);
+  int get hashCode => Object.hash(id, board, score, createdAt, boardSize);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -412,7 +465,8 @@ class GameState extends DataClass implements Insertable<GameState> {
           other.id == this.id &&
           other.board == this.board &&
           other.score == this.score &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.boardSize == this.boardSize);
 }
 
 class GameStatesCompanion extends UpdateCompanion<GameState> {
@@ -420,17 +474,20 @@ class GameStatesCompanion extends UpdateCompanion<GameState> {
   final Value<String> board;
   final Value<int> score;
   final Value<DateTime> createdAt;
+  final Value<int> boardSize;
   const GameStatesCompanion({
     this.id = const Value.absent(),
     this.board = const Value.absent(),
     this.score = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.boardSize = const Value.absent(),
   });
   GameStatesCompanion.insert({
     this.id = const Value.absent(),
     required String board,
     required int score,
     required DateTime createdAt,
+    this.boardSize = const Value.absent(),
   }) : board = Value(board),
        score = Value(score),
        createdAt = Value(createdAt);
@@ -439,12 +496,14 @@ class GameStatesCompanion extends UpdateCompanion<GameState> {
     Expression<String>? board,
     Expression<int>? score,
     Expression<DateTime>? createdAt,
+    Expression<int>? boardSize,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (board != null) 'board': board,
       if (score != null) 'score': score,
       if (createdAt != null) 'created_at': createdAt,
+      if (boardSize != null) 'board_size': boardSize,
     });
   }
 
@@ -453,12 +512,14 @@ class GameStatesCompanion extends UpdateCompanion<GameState> {
     Value<String>? board,
     Value<int>? score,
     Value<DateTime>? createdAt,
+    Value<int>? boardSize,
   }) {
     return GameStatesCompanion(
       id: id ?? this.id,
       board: board ?? this.board,
       score: score ?? this.score,
       createdAt: createdAt ?? this.createdAt,
+      boardSize: boardSize ?? this.boardSize,
     );
   }
 
@@ -477,6 +538,9 @@ class GameStatesCompanion extends UpdateCompanion<GameState> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (boardSize.present) {
+      map['board_size'] = Variable<int>(boardSize.value);
+    }
     return map;
   }
 
@@ -486,7 +550,8 @@ class GameStatesCompanion extends UpdateCompanion<GameState> {
           ..write('id: $id, ')
           ..write('board: $board, ')
           ..write('score: $score, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('boardSize: $boardSize')
           ..write(')'))
         .toString();
   }
@@ -774,15 +839,276 @@ class AudioSettingsCompanion extends UpdateCompanion<AudioSetting> {
   }
 }
 
+class $GameModeSettingsTable extends GameModeSettings
+    with TableInfo<$GameModeSettingsTable, GameModeSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GameModeSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _boardSizeMeta = const VerificationMeta(
+    'boardSize',
+  );
+  @override
+  late final GeneratedColumn<int> boardSize = GeneratedColumn<int>(
+    'board_size',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(4),
+  );
+  static const VerificationMeta _tilesToSpawnMeta = const VerificationMeta(
+    'tilesToSpawn',
+  );
+  @override
+  late final GeneratedColumn<int> tilesToSpawn = GeneratedColumn<int>(
+    'tiles_to_spawn',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, boardSize, tilesToSpawn];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'game_mode_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GameModeSetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('board_size')) {
+      context.handle(
+        _boardSizeMeta,
+        boardSize.isAcceptableOrUnknown(data['board_size']!, _boardSizeMeta),
+      );
+    }
+    if (data.containsKey('tiles_to_spawn')) {
+      context.handle(
+        _tilesToSpawnMeta,
+        tilesToSpawn.isAcceptableOrUnknown(
+          data['tiles_to_spawn']!,
+          _tilesToSpawnMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  GameModeSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GameModeSetting(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      boardSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}board_size'],
+      )!,
+      tilesToSpawn: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}tiles_to_spawn'],
+      )!,
+    );
+  }
+
+  @override
+  $GameModeSettingsTable createAlias(String alias) {
+    return $GameModeSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class GameModeSetting extends DataClass implements Insertable<GameModeSetting> {
+  /// The ID of the game mode setting entry.
+  final int id;
+
+  /// The grid size for the game board (e.g., 4, 5, or 6).
+  final int boardSize;
+
+  /// The number of new tiles to add per move.
+  final int tilesToSpawn;
+  const GameModeSetting({
+    required this.id,
+    required this.boardSize,
+    required this.tilesToSpawn,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['board_size'] = Variable<int>(boardSize);
+    map['tiles_to_spawn'] = Variable<int>(tilesToSpawn);
+    return map;
+  }
+
+  GameModeSettingsCompanion toCompanion(bool nullToAbsent) {
+    return GameModeSettingsCompanion(
+      id: Value(id),
+      boardSize: Value(boardSize),
+      tilesToSpawn: Value(tilesToSpawn),
+    );
+  }
+
+  factory GameModeSetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GameModeSetting(
+      id: serializer.fromJson<int>(json['id']),
+      boardSize: serializer.fromJson<int>(json['boardSize']),
+      tilesToSpawn: serializer.fromJson<int>(json['tilesToSpawn']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'boardSize': serializer.toJson<int>(boardSize),
+      'tilesToSpawn': serializer.toJson<int>(tilesToSpawn),
+    };
+  }
+
+  GameModeSetting copyWith({int? id, int? boardSize, int? tilesToSpawn}) =>
+      GameModeSetting(
+        id: id ?? this.id,
+        boardSize: boardSize ?? this.boardSize,
+        tilesToSpawn: tilesToSpawn ?? this.tilesToSpawn,
+      );
+  GameModeSetting copyWithCompanion(GameModeSettingsCompanion data) {
+    return GameModeSetting(
+      id: data.id.present ? data.id.value : this.id,
+      boardSize: data.boardSize.present ? data.boardSize.value : this.boardSize,
+      tilesToSpawn: data.tilesToSpawn.present
+          ? data.tilesToSpawn.value
+          : this.tilesToSpawn,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GameModeSetting(')
+          ..write('id: $id, ')
+          ..write('boardSize: $boardSize, ')
+          ..write('tilesToSpawn: $tilesToSpawn')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, boardSize, tilesToSpawn);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GameModeSetting &&
+          other.id == this.id &&
+          other.boardSize == this.boardSize &&
+          other.tilesToSpawn == this.tilesToSpawn);
+}
+
+class GameModeSettingsCompanion extends UpdateCompanion<GameModeSetting> {
+  final Value<int> id;
+  final Value<int> boardSize;
+  final Value<int> tilesToSpawn;
+  const GameModeSettingsCompanion({
+    this.id = const Value.absent(),
+    this.boardSize = const Value.absent(),
+    this.tilesToSpawn = const Value.absent(),
+  });
+  GameModeSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    this.boardSize = const Value.absent(),
+    this.tilesToSpawn = const Value.absent(),
+  });
+  static Insertable<GameModeSetting> custom({
+    Expression<int>? id,
+    Expression<int>? boardSize,
+    Expression<int>? tilesToSpawn,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (boardSize != null) 'board_size': boardSize,
+      if (tilesToSpawn != null) 'tiles_to_spawn': tilesToSpawn,
+    });
+  }
+
+  GameModeSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? boardSize,
+    Value<int>? tilesToSpawn,
+  }) {
+    return GameModeSettingsCompanion(
+      id: id ?? this.id,
+      boardSize: boardSize ?? this.boardSize,
+      tilesToSpawn: tilesToSpawn ?? this.tilesToSpawn,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (boardSize.present) {
+      map['board_size'] = Variable<int>(boardSize.value);
+    }
+    if (tilesToSpawn.present) {
+      map['tiles_to_spawn'] = Variable<int>(tilesToSpawn.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GameModeSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('boardSize: $boardSize, ')
+          ..write('tilesToSpawn: $tilesToSpawn')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $HighScoresTable highScores = $HighScoresTable(this);
   late final $GameStatesTable gameStates = $GameStatesTable(this);
   late final $AudioSettingsTable audioSettings = $AudioSettingsTable(this);
+  late final $GameModeSettingsTable gameModeSettings = $GameModeSettingsTable(
+    this,
+  );
   late final GameStateDao gameStateDao = GameStateDao(this as AppDatabase);
   late final HighScoreDao highScoreDao = HighScoreDao(this as AppDatabase);
   late final AudioSettingsDao audioSettingsDao = AudioSettingsDao(
+    this as AppDatabase,
+  );
+  late final GameModeSettingsDao gameModeSettingsDao = GameModeSettingsDao(
     this as AppDatabase,
   );
   @override
@@ -793,13 +1119,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     highScores,
     gameStates,
     audioSettings,
+    gameModeSettings,
   ];
 }
 
 typedef $$HighScoresTableCreateCompanionBuilder =
-    HighScoresCompanion Function({Value<int> id, required int score});
+    HighScoresCompanion Function({required int score, Value<int> boardSize});
 typedef $$HighScoresTableUpdateCompanionBuilder =
-    HighScoresCompanion Function({Value<int> id, Value<int> score});
+    HighScoresCompanion Function({Value<int> score, Value<int> boardSize});
 
 class $$HighScoresTableFilterComposer
     extends Composer<_$AppDatabase, $HighScoresTable> {
@@ -810,13 +1137,13 @@ class $$HighScoresTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
+  ColumnFilters<int> get score => $composableBuilder(
+    column: $table.score,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get score => $composableBuilder(
-    column: $table.score,
+  ColumnFilters<int> get boardSize => $composableBuilder(
+    column: $table.boardSize,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -830,13 +1157,13 @@ class $$HighScoresTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
+  ColumnOrderings<int> get score => $composableBuilder(
+    column: $table.score,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get score => $composableBuilder(
-    column: $table.score,
+  ColumnOrderings<int> get boardSize => $composableBuilder(
+    column: $table.boardSize,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -850,11 +1177,11 @@ class $$HighScoresTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
   GeneratedColumn<int> get score =>
       $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<int> get boardSize =>
+      $composableBuilder(column: $table.boardSize, builder: (column) => column);
 }
 
 class $$HighScoresTableTableManager
@@ -888,12 +1215,17 @@ class $$HighScoresTableTableManager
               $$HighScoresTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
                 Value<int> score = const Value.absent(),
-              }) => HighScoresCompanion(id: id, score: score),
+                Value<int> boardSize = const Value.absent(),
+              }) => HighScoresCompanion(score: score, boardSize: boardSize),
           createCompanionCallback:
-              ({Value<int> id = const Value.absent(), required int score}) =>
-                  HighScoresCompanion.insert(id: id, score: score),
+              ({
+                required int score,
+                Value<int> boardSize = const Value.absent(),
+              }) => HighScoresCompanion.insert(
+                score: score,
+                boardSize: boardSize,
+              ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
@@ -922,6 +1254,7 @@ typedef $$GameStatesTableCreateCompanionBuilder =
       required String board,
       required int score,
       required DateTime createdAt,
+      Value<int> boardSize,
     });
 typedef $$GameStatesTableUpdateCompanionBuilder =
     GameStatesCompanion Function({
@@ -929,6 +1262,7 @@ typedef $$GameStatesTableUpdateCompanionBuilder =
       Value<String> board,
       Value<int> score,
       Value<DateTime> createdAt,
+      Value<int> boardSize,
     });
 
 class $$GameStatesTableFilterComposer
@@ -957,6 +1291,11 @@ class $$GameStatesTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get boardSize => $composableBuilder(
+    column: $table.boardSize,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -989,6 +1328,11 @@ class $$GameStatesTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get boardSize => $composableBuilder(
+    column: $table.boardSize,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$GameStatesTableAnnotationComposer
@@ -1011,6 +1355,9 @@ class $$GameStatesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get boardSize =>
+      $composableBuilder(column: $table.boardSize, builder: (column) => column);
 }
 
 class $$GameStatesTableTableManager
@@ -1048,11 +1395,13 @@ class $$GameStatesTableTableManager
                 Value<String> board = const Value.absent(),
                 Value<int> score = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> boardSize = const Value.absent(),
               }) => GameStatesCompanion(
                 id: id,
                 board: board,
                 score: score,
                 createdAt: createdAt,
+                boardSize: boardSize,
               ),
           createCompanionCallback:
               ({
@@ -1060,11 +1409,13 @@ class $$GameStatesTableTableManager
                 required String board,
                 required int score,
                 required DateTime createdAt,
+                Value<int> boardSize = const Value.absent(),
               }) => GameStatesCompanion.insert(
                 id: id,
                 board: board,
                 score: score,
                 createdAt: createdAt,
+                boardSize: boardSize,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -1248,6 +1599,170 @@ typedef $$AudioSettingsTableProcessedTableManager =
       AudioSetting,
       PrefetchHooks Function()
     >;
+typedef $$GameModeSettingsTableCreateCompanionBuilder =
+    GameModeSettingsCompanion Function({
+      Value<int> id,
+      Value<int> boardSize,
+      Value<int> tilesToSpawn,
+    });
+typedef $$GameModeSettingsTableUpdateCompanionBuilder =
+    GameModeSettingsCompanion Function({
+      Value<int> id,
+      Value<int> boardSize,
+      Value<int> tilesToSpawn,
+    });
+
+class $$GameModeSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $GameModeSettingsTable> {
+  $$GameModeSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get boardSize => $composableBuilder(
+    column: $table.boardSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get tilesToSpawn => $composableBuilder(
+    column: $table.tilesToSpawn,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$GameModeSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $GameModeSettingsTable> {
+  $$GameModeSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get boardSize => $composableBuilder(
+    column: $table.boardSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get tilesToSpawn => $composableBuilder(
+    column: $table.tilesToSpawn,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$GameModeSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $GameModeSettingsTable> {
+  $$GameModeSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get boardSize =>
+      $composableBuilder(column: $table.boardSize, builder: (column) => column);
+
+  GeneratedColumn<int> get tilesToSpawn => $composableBuilder(
+    column: $table.tilesToSpawn,
+    builder: (column) => column,
+  );
+}
+
+class $$GameModeSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $GameModeSettingsTable,
+          GameModeSetting,
+          $$GameModeSettingsTableFilterComposer,
+          $$GameModeSettingsTableOrderingComposer,
+          $$GameModeSettingsTableAnnotationComposer,
+          $$GameModeSettingsTableCreateCompanionBuilder,
+          $$GameModeSettingsTableUpdateCompanionBuilder,
+          (
+            GameModeSetting,
+            BaseReferences<
+              _$AppDatabase,
+              $GameModeSettingsTable,
+              GameModeSetting
+            >,
+          ),
+          GameModeSetting,
+          PrefetchHooks Function()
+        > {
+  $$GameModeSettingsTableTableManager(
+    _$AppDatabase db,
+    $GameModeSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GameModeSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GameModeSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GameModeSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> boardSize = const Value.absent(),
+                Value<int> tilesToSpawn = const Value.absent(),
+              }) => GameModeSettingsCompanion(
+                id: id,
+                boardSize: boardSize,
+                tilesToSpawn: tilesToSpawn,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> boardSize = const Value.absent(),
+                Value<int> tilesToSpawn = const Value.absent(),
+              }) => GameModeSettingsCompanion.insert(
+                id: id,
+                boardSize: boardSize,
+                tilesToSpawn: tilesToSpawn,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$GameModeSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $GameModeSettingsTable,
+      GameModeSetting,
+      $$GameModeSettingsTableFilterComposer,
+      $$GameModeSettingsTableOrderingComposer,
+      $$GameModeSettingsTableAnnotationComposer,
+      $$GameModeSettingsTableCreateCompanionBuilder,
+      $$GameModeSettingsTableUpdateCompanionBuilder,
+      (
+        GameModeSetting,
+        BaseReferences<_$AppDatabase, $GameModeSettingsTable, GameModeSetting>,
+      ),
+      GameModeSetting,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1258,6 +1773,8 @@ class $AppDatabaseManager {
       $$GameStatesTableTableManager(_db, _db.gameStates);
   $$AudioSettingsTableTableManager get audioSettings =>
       $$AudioSettingsTableTableManager(_db, _db.audioSettings);
+  $$GameModeSettingsTableTableManager get gameModeSettings =>
+      $$GameModeSettingsTableTableManager(_db, _db.gameModeSettings);
 }
 
 mixin _$GameStateDaoMixin on DatabaseAccessor<AppDatabase> {
@@ -1268,4 +1785,8 @@ mixin _$HighScoreDaoMixin on DatabaseAccessor<AppDatabase> {
 }
 mixin _$AudioSettingsDaoMixin on DatabaseAccessor<AppDatabase> {
   $AudioSettingsTable get audioSettings => attachedDatabase.audioSettings;
+}
+mixin _$GameModeSettingsDaoMixin on DatabaseAccessor<AppDatabase> {
+  $GameModeSettingsTable get gameModeSettings =>
+      attachedDatabase.gameModeSettings;
 }

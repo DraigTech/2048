@@ -44,7 +44,7 @@ test/
 - **Strict Linting**: All code **must** strictly adhere to the rules defined in `analysis_options.yaml`. Pay close attention to `public_member_api_docs`, `directives_ordering`, and `require_trailing_commas`.
 
 ## Feature History
-
+- **006-persistent-game-modes**: Added persistent game modes, allowing players to select board sizes (4x4, 5x5, 6x6) and tracking high scores independently for each mode.
 - **005-gameplay-enhancements**: Added audio controls, settings persistence, and a replay button.
 - **004-save-game-state**: Implemented local persistence for game state using Drift.
 - **003-game-over-screen**: Added the game over UI and logic.

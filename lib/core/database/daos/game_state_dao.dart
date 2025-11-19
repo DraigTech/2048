@@ -8,8 +8,11 @@ class GameStateDao extends DatabaseAccessor<AppDatabase>
   GameStateDao(super.attachedDatabase);
 
   /// Retrieves the most recently saved game state.
-  Future<GameState?> getLatestGameState() =>
-      (select(gameStates)..orderBy([(t) => OrderingTerm.desc(t.createdAt)]))
+  Future<GameState?> getLatestGameState(int boardSize) =>
+      (select(gameStates)
+            ..where((t) => t.boardSize.equals(boardSize))
+            ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+            ..limit(1))
           .getSingleOrNull();
 
   /// Saves or updates the game state.

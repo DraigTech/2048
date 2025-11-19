@@ -62,6 +62,7 @@ class GameContentWidget extends StatelessWidget {
           child: GameBoardWidget(
             gameBoard: state.gameBoard,
             gameBoardSize: gameBoardSize,
+            gridSize: state.boardSize,
           ),
         );
 

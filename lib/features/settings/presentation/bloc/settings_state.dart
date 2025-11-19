@@ -18,13 +18,19 @@ class SettingsInitial extends SettingsState {
 /// State when the settings are successfully loaded.
 class SettingsLoaded extends SettingsState {
   /// Creates an instance of [SettingsLoaded].
-  const SettingsLoaded(this.settings);
+  const SettingsLoaded({
+    required this.audioSettings,
+    required this.gameMode,
+  });
 
   /// The current audio settings.
-  final AudioSettings settings;
+  final AudioSettings audioSettings;
+
+  /// The current game mode.
+  final GameMode gameMode;
 
   @override
-  List<Object> get props => [settings];
+  List<Object> get props => [audioSettings, gameMode];
 }
 
 /// State when an error occurs while loading or saving settings.

@@ -58,5 +58,19 @@
   "soundEffects": "Sound Effects",
   "@soundEffects": {
     "description": "Label for sound effects setting"
+  },
+  "gameMode": "Game Mode",
+  "@gameMode": {
+    "description": "Label for game mode setting"
+  },
+  "boardSizeOption": "{boardSize}x{boardSize}",
+  "@boardSizeOption": {
+    "description": "Text for displaying board size options in dropdown",
+    "placeholders": {
+      "boardSize": {
+        "type": "int",
+        "example": "4"
+      }
+    }
   }
 }

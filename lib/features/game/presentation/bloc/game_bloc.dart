@@ -7,9 +7,15 @@ import 'package:draig_2048/features/game/domain/entities/game_board.dart';
 import 'package:draig_2048/features/game/domain/entities/high_score.dart';
 import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
 import 'package:draig_2048/features/game/domain/usecases/check_game_over.dart';
+import 'package:draig_2048/features/game/domain/usecases/clear_board.dart';
 import 'package:draig_2048/features/game/domain/usecases/get_high_score.dart';
+import 'package:draig_2048/features/game/domain/usecases/load_board.dart';
 import 'package:draig_2048/features/game/domain/usecases/move_tiles.dart';
+import 'package:draig_2048/features/game/domain/usecases/new_game.dart';
+import 'package:draig_2048/features/game/domain/usecases/save_board.dart';
 import 'package:draig_2048/features/game/domain/usecases/save_high_score.dart';
+import 'package:draig_2048/features/settings/domain/usecases/get_game_mode.dart';
+import 'package:draig_2048/features/settings/domain/usecases/watch_game_mode.dart';
 import 'package:equatable/equatable.dart';
 
 part 'game_event.dart';
@@ -26,10 +32,15 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   GameBloc({
     required this.audioManager,
     required this.moveTiles,
-    required this.repository,
     required this.getHighScore,
     required this.saveHighScore,
     required this.checkGameOver,
+    required this.loadBoard,
+    required this.newGame,
+    required this.saveBoard,
+    required this.clearBoard,
+    required this.getGameMode,
+    required this.watchGameMode,
   }) : super(GameInitial()) {
     on<GameStartEvent>(_onGameStarted);
     on<GameMoveEvent>(_onGameMoved);
@@ -45,9 +56,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   /// Use case for moving tiles on the game board.
   final MoveTilesUseCase moveTiles;
 
-  /// Repository for game-related data operations.
-  final GameRepository repository;
-
   /// Use case for retrieving the high score.
   final GetHighScoreUseCase getHighScore;
 
@@ -57,16 +65,50 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   /// Use case for checking if the game is over.
   final CheckGameOverUseCase checkGameOver;
 
+  /// Use case for loading the game board.
+  final LoadBoardUseCase loadBoard;
+
+  /// Use case for creating a new game board.
+  final NewGameUseCase newGame;
+
+  /// Use case for saving the game board.
+  final SaveBoardUseCase saveBoard;
+
+  /// Use case for clearing the game board.
+  final ClearBoardUseCase clearBoard;
+
+  /// Use case for getting game mode.
+  final GetGameModeUseCase getGameMode;
+
+  /// Use case for watching game mode.
+  final WatchGameModeUseCase watchGameMode;
+
   /// Handles the [GameStartEvent] to initialize the game and load audio assets.
   Future<void> _onGameStarted(
     GameStartEvent event,
     Emitter<GameState> emit,
   ) async {
     try {
-      final loadedBoard = await repository.loadBoard();
+      final currentGameMode = await getGameMode();
+      final loadedBoard = await loadBoard(currentGameMode.boardSize);
       if (loadedBoard != null) {
-        final currentHighScore = await getHighScore();
-        emit(GameLoaded(loadedBoard, highScore: currentHighScore.score));
+        final currentHighScore = await getHighScore(currentGameMode.boardSize);
+
+        emit(
+          GameLoaded(
+            loadedBoard,
+            highScore: currentHighScore.score,
+            boardSize: currentGameMode.boardSize,
+          ),
+        );
+
+        watchGameMode()
+            .distinct(
+              (previous, current) => previous.boardSize == current.boardSize,
+            )
+            .listen(
+              (event) => add(NewGameEvent()),
+            );
       } else {
         add(NewGameEvent());
       }
@@ -87,7 +129,10 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       final currentState = state as GameLoaded;
       final currentBoard = currentState.gameBoard;
       final currentHighScore = currentState.highScore;
-      final (newBoard, merged) = await moveTiles(currentBoard, event.direction);
+      final (newBoard, merged) = await moveTiles(
+        currentBoard,
+        event.direction,
+      );
 
       if (newBoard != currentBoard) {
         if (merged) {
@@ -99,10 +144,19 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       var updatedHighScore = currentHighScore;
       if (newBoard.score > currentHighScore) {
         updatedHighScore = newBoard.score;
-        await saveHighScore(HighScore(score: updatedHighScore));
+        await saveHighScore(
+          HighScore(score: updatedHighScore),
+          currentState.boardSize,
+        );
       }
 
-      emit(GameLoaded(newBoard, highScore: updatedHighScore));
+      emit(
+        GameLoaded(
+          newBoard,
+          highScore: updatedHighScore,
+          boardSize: currentState.boardSize,
+        ),
+      );
       add(CheckGameOverEvent());
     }
   }
@@ -123,6 +177,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
             currentState.gameBoard,
             highScore: currentState.highScore,
             isGameOver: true,
+            boardSize: currentState.boardSize,
           ),
         );
       }
@@ -133,10 +188,17 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   ///
   /// It creates a new game board and loads the current high score.
   Future<void> _onNewGame(NewGameEvent event, Emitter<GameState> emit) async {
-    await repository.clearBoard();
-    final newBoard = await repository.newGame();
-    final currentHighScore = await getHighScore();
-    emit(GameLoaded(newBoard, highScore: currentHighScore.score));
+    await clearBoard();
+    final currentGameMode = await getGameMode();
+    final newBoard = await newGame(currentGameMode.boardSize);
+    final currentHighScore = await getHighScore(currentGameMode.boardSize);
+    emit(
+      GameLoaded(
+        newBoard,
+        highScore: currentHighScore.score,
+        boardSize: currentGameMode.boardSize,
+      ),
+    );
   }
 
   /// Handles the [SaveGameEvent] to save the current game state.
@@ -146,7 +208,10 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   ) async {
     if (state is GameLoaded) {
       final currentState = state as GameLoaded;
-      await repository.saveBoard(currentState.gameBoard);
+      await saveBoard(
+        currentState.gameBoard,
+        currentState.boardSize,
+      );
     }
   }
 }

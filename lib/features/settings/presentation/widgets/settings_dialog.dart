@@ -1,13 +1,19 @@
 import 'package:draig_2048/core/l10n/app_localizations.dart';
+import 'package:draig_2048/features/settings/domain/entities/game_mode.dart';
 import 'package:draig_2048/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// A dialog that allows the user to configure audio settings.
-class SettingsDialog extends StatelessWidget {
+class SettingsDialog extends StatefulWidget {
   /// Creates a [SettingsDialog] instance.
   const SettingsDialog({super.key});
 
+  @override
+  State<SettingsDialog> createState() => _SettingsDialogState();
+}
+
+class _SettingsDialogState extends State<SettingsDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -30,7 +36,7 @@ class SettingsDialog extends StatelessWidget {
                   SwitchListTile(
                     key: const Key('music_switch'),
                     title: Text(l10n.backgroundMusic),
-                    value: state.settings.isMusicEnabled,
+                    value: state.audioSettings.isMusicEnabled,
                     onChanged: (value) {
                       context.read<SettingsBloc>().add(
                         ToggleMusic(isMusicEnabled: value),
@@ -40,12 +46,33 @@ class SettingsDialog extends StatelessWidget {
                   SwitchListTile(
                     key: const Key('sound_effects_switch'),
                     title: Text(l10n.soundEffects),
-                    value: state.settings.isSoundEffectsEnabled,
+                    value: state.audioSettings.isSoundEffectsEnabled,
                     onChanged: (value) {
                       context.read<SettingsBloc>().add(
                         ToggleSoundEffects(isSoundEffectsEnabled: value),
                       );
                     },
+                  ),
+                  ListTile(
+                    title: Text(l10n.gameMode),
+                    trailing: DropdownButton<GameMode>(
+                      value: state.gameMode,
+                      onChanged: (GameMode? newMode) async {
+                        if (newMode != null && newMode != state.gameMode) {
+                          context.read<SettingsBloc>().add(
+                            ChangeGameMode(gameMode: newMode),
+                          );
+                        }
+                      },
+                      items: GameMode.allModes.map<DropdownMenuItem<GameMode>>((
+                        GameMode mode,
+                      ) {
+                        return DropdownMenuItem<GameMode>(
+                          value: mode,
+                          child: Text(l10n.boardSizeOption(mode.boardSize)),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ],
               );

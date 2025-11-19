@@ -1,32 +1,29 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:draig_2048/core/database/database.dart'
-    as db;
+import 'package:draig_2048/core/database/database.dart' as db;
 import 'package:draig_2048/features/game/domain/entities/game_board.dart';
 import 'package:draig_2048/features/game/domain/entities/high_score.dart';
 import 'package:draig_2048/features/game/domain/entities/tile.dart';
 import 'package:draig_2048/features/game/domain/repositories/game_repository.dart';
+import 'package:draig_2048/features/settings/domain/entities/game_mode.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:uuid/uuid.dart';
 
 /// Implementation of the [GameRepository] interface.
 ///
 /// This class handles the game logic, including creating new games,
-/// moving tiles, checking for game over conditions, and managing high scores.
+/// moving tiles, checking for game over conditions,
+/// and managing high scores.
 class GameRepositoryImpl implements GameRepository {
   /// Creates an instance of [GameRepositoryImpl].
-  GameRepositoryImpl(this._database, this._gameStateDao);
-
-  /// The size of the game board (e.g., 4 for a 4x4 board).
-  static const int _boardSize = 4;
+  GameRepositoryImpl(this._gameStateDao, this._highScoreDao);
 
   /// A random number generator for placing new tiles.
   final Random _random = Random();
 
-  /// The local database instance for storing high scores.
-  final db.AppDatabase _database;
   final db.GameStateDao _gameStateDao;
+  final db.HighScoreDao _highScoreDao;
 
   /// A UUID generator for creating unique tile IDs.
   final Uuid _uuid = const Uuid();
@@ -35,8 +32,8 @@ class GameRepositoryImpl implements GameRepository {
   String _generateUniqueId() => _uuid.v4();
 
   @override
-  Future<GameBoard?> loadBoard() async {
-    final savedState = await _gameStateDao.getLatestGameState();
+  Future<GameBoard?> loadBoard(int boardSize) async {
+    final savedState = await _gameStateDao.getLatestGameState(boardSize);
     if (savedState == null) {
       return null;
     }
@@ -47,12 +44,12 @@ class GameRepositoryImpl implements GameRepository {
         .toList();
 
     final tiles = List<List<Tile?>>.generate(
-      _boardSize,
-      (_) => List.filled(_boardSize, null),
+      boardSize,
+      (_) => List.filled(boardSize, null),
     );
 
-    for (var r = 0; r < _boardSize; r++) {
-      for (var c = 0; c < _boardSize; c++) {
+    for (var r = 0; r < boardSize; r++) {
+      for (var c = 0; c < boardSize; c++) {
         if (intTiles[r][c] != 0) {
           tiles[r][c] = Tile(
             id: _generateUniqueId(),
@@ -64,16 +61,19 @@ class GameRepositoryImpl implements GameRepository {
       }
     }
 
-    return GameBoard(tiles: _flattenTiles(tiles), score: savedState.score);
+    return GameBoard(
+      tiles: _flattenTiles(tiles, boardSize),
+      score: savedState.score,
+    );
   }
 
   @override
-  Future<void> saveBoard(GameBoard board) async {
-    final tiles = _copyTiles(board.tiles);
+  Future<void> saveBoard(GameBoard board, int boardSize) async {
+    final tiles = _copyTiles(board.tiles, boardSize);
     final intTiles = List<List<int>>.generate(
-      _boardSize,
+      boardSize,
       (r) => List.generate(
-        _boardSize,
+        boardSize,
         (c) => tiles[r][c]?.value ?? 0,
       ),
     );
@@ -82,6 +82,7 @@ class GameRepositoryImpl implements GameRepository {
       id: const drift.Value(1),
       board: drift.Value(jsonEncode(intTiles)),
       score: drift.Value(board.score),
+      boardSize: drift.Value(boardSize),
       createdAt: drift.Value(DateTime.now()),
     );
     await _gameStateDao.saveGameState(entry);
@@ -93,14 +94,14 @@ class GameRepositoryImpl implements GameRepository {
   }
 
   @override
-  Future<GameBoard> newGame() async {
+  Future<GameBoard> newGame(int boardSize) async {
     final tiles = List<List<Tile?>>.generate(
-      _boardSize,
-      (_) => List.filled(_boardSize, null),
+      boardSize,
+      (_) => List.filled(boardSize, null),
     );
-    _addRandomTile(tiles);
-    _addRandomTile(tiles);
-    return GameBoard(tiles: _flattenTiles(tiles));
+    _addRandomTile(tiles, boardSize);
+    _addRandomTile(tiles, boardSize);
+    return GameBoard(tiles: _flattenTiles(tiles, boardSize));
   }
 
   @override
@@ -108,39 +109,65 @@ class GameRepositoryImpl implements GameRepository {
     GameBoard board,
     MoveDirection direction,
   ) async {
-    final newTiles = _copyTiles(board.tiles);
+    final boardSize = board.tiles.length;
+    final newTiles = _copyTiles(board.tiles, boardSize);
     var currentScore = board.score;
     var moved = false;
     var merged = false;
 
     switch (direction) {
       case MoveDirection.up:
-        (moved, currentScore, merged) = _moveUp(newTiles, currentScore);
+        (moved, currentScore, merged) = _moveUp(
+          newTiles,
+          currentScore,
+          boardSize,
+        );
       case MoveDirection.down:
-        (moved, currentScore, merged) = _moveDown(newTiles, currentScore);
+        (moved, currentScore, merged) = _moveDown(
+          newTiles,
+          currentScore,
+          boardSize,
+        );
       case MoveDirection.left:
-        (moved, currentScore, merged) = _moveLeft(newTiles, currentScore);
+        (moved, currentScore, merged) = _moveLeft(
+          newTiles,
+          currentScore,
+          boardSize,
+        );
       case MoveDirection.right:
-        (moved, currentScore, merged) = _moveRight(newTiles, currentScore);
+        (moved, currentScore, merged) = _moveRight(
+          newTiles,
+          currentScore,
+          boardSize,
+        );
     }
 
     if (moved) {
-      _addRandomTile(newTiles);
+      final tilesToSpawn = GameMode.allModes
+          .firstWhere(
+            (mode) => mode.boardSize == boardSize,
+          )
+          .tilesToSpawn;
+
+      for (var i = 0; i < tilesToSpawn; i++) {
+        _addRandomTile(newTiles, boardSize);
+      }
     }
 
     return (
-      GameBoard(tiles: _flattenTiles(newTiles), score: currentScore),
+      GameBoard(tiles: _flattenTiles(newTiles, boardSize), score: currentScore),
       merged,
     );
   }
 
   @override
   Future<bool> isGameOver(GameBoard board) async {
-    final tiles = _copyTiles(board.tiles);
+    final boardSize = board.tiles.length;
+    final tiles = _copyTiles(board.tiles, boardSize);
 
     // Check for empty cells
-    for (var r = 0; r < _boardSize; r++) {
-      for (var c = 0; c < _boardSize; c++) {
+    for (var r = 0; r < boardSize; r++) {
+      for (var c = 0; c < boardSize; c++) {
         if (tiles[r][c] == null) {
           return false;
         }
@@ -148,15 +175,15 @@ class GameRepositoryImpl implements GameRepository {
     }
 
     // Check for possible merges
-    for (var r = 0; r < _boardSize; r++) {
-      for (var c = 0; c < _boardSize; c++) {
+    for (var r = 0; r < boardSize; r++) {
+      for (var c = 0; c < boardSize; c++) {
         final tile = tiles[r][c]!;
         // Check right
-        if (c + 1 < _boardSize && tile.value == tiles[r][c + 1]?.value) {
+        if (c + 1 < boardSize && tile.value == tiles[r][c + 1]?.value) {
           return false;
         }
         // Check down
-        if (r + 1 < _boardSize && tile.value == tiles[r + 1][c]?.value) {
+        if (r + 1 < boardSize && tile.value == tiles[r + 1][c]?.value) {
           return false;
         }
       }
@@ -166,39 +193,33 @@ class GameRepositoryImpl implements GameRepository {
   }
 
   @override
-  Future<HighScore> getHighScore() async {
-    final results = await _database.select(_database.highScores).get();
-    if (results.isEmpty) {
+  Future<HighScore> getHighScore(int boardSize) async {
+    final results = await _highScoreDao.getHighScore(boardSize);
+    if (results == null) {
       return const HighScore(score: 0);
     } else {
-      final maxScore = results
-          .map((e) => e.score)
-          .reduce((a, b) => a > b ? a : b);
-      return HighScore(score: maxScore);
+      return HighScore(score: results.score);
     }
   }
 
   @override
-  Future<void> saveHighScore(HighScore highScore) async {
-    await _database
-        .into(_database.highScores)
-        .insert(
-          db.HighScoresCompanion.insert(
-            id: const drift.Value(1),
-            score: highScore.score,
-          ),
-          mode: drift.InsertMode.insertOrReplace,
-        );
+  Future<void> saveHighScore(HighScore highScore, int boardSize) async {
+    await _highScoreDao.saveHighScore(
+      db.HighScoresCompanion(
+        score: drift.Value(highScore.score),
+        boardSize: drift.Value(boardSize),
+      ),
+    );
   }
 
   /// Flattens a 2D list of [Tile]s into a 1D list.
-  List<List<Tile>> _flattenTiles(List<List<Tile?>> tiles) {
+  List<List<Tile>> _flattenTiles(List<List<Tile?>> tiles, int boardSize) {
     final flattened = <List<Tile>>[];
 
-    for (var r = 0; r < _boardSize; r++) {
+    for (var r = 0; r < boardSize; r++) {
       final row = <Tile>[];
 
-      for (var c = 0; c < _boardSize; c++) {
+      for (var c = 0; c < boardSize; c++) {
         if (tiles[r][c] != null) {
           row.add(tiles[r][c]!);
         }
@@ -214,10 +235,10 @@ class GameRepositoryImpl implements GameRepository {
   ///
   /// This ensures that modifications to the copied list do not
   /// affect the original.
-  List<List<Tile?>> _copyTiles(List<List<Tile>> tiles) {
+  List<List<Tile?>> _copyTiles(List<List<Tile>> tiles, int boardSize) {
     final newTiles = List<List<Tile?>>.generate(
-      _boardSize,
-      (_) => List.filled(_boardSize, null),
+      boardSize,
+      (_) => List.filled(boardSize, null),
     );
 
     for (final tile in tiles.expand((row) => row)) {
@@ -231,11 +252,11 @@ class GameRepositoryImpl implements GameRepository {
   /// the [tiles] board.
   ///
   /// If no empty cells are available, no tile is added.
-  void _addRandomTile(List<List<Tile?>> tiles) {
+  void _addRandomTile(List<List<Tile?>> tiles, int boardSize) {
     final emptyCells = <({int row, int col})>[];
 
-    for (var r = 0; r < _boardSize; r++) {
-      for (var c = 0; c < _boardSize; c++) {
+    for (var r = 0; r < boardSize; r++) {
+      for (var c = 0; c < boardSize; c++) {
         if (tiles[r][c] == null) {
           emptyCells.add((row: r, col: c));
         }
@@ -263,14 +284,14 @@ class GameRepositoryImpl implements GameRepository {
   /// - A boolean indicating if any tile moved.
   /// - The updated score.
   /// - A boolean indicating if any merge occurred.
-  (bool, int, bool) _moveUp(List<List<Tile?>> tiles, int score) {
+  (bool, int, bool) _moveUp(List<List<Tile?>> tiles, int score, int boardSize) {
     var moved = false;
     var merged = false;
     var newScore = score;
 
-    for (var col = 0; col < _boardSize; col++) {
+    for (var col = 0; col < boardSize; col++) {
       final column = <Tile>[];
-      for (var row = 0; row < _boardSize; row++) {
+      for (var row = 0; row < boardSize; row++) {
         if (tiles[row][col] != null) {
           column.add(tiles[row][col]!);
         }
@@ -286,11 +307,11 @@ class GameRepositoryImpl implements GameRepository {
       newScore = mergedScore;
       final newColumn = mergedColumn;
 
-      while (newColumn.length < _boardSize) {
+      while (newColumn.length < boardSize) {
         newColumn.add(null);
       }
 
-      for (var row = 0; row < _boardSize; row++) {
+      for (var row = 0; row < boardSize; row++) {
         if (tiles[row][col]?.value != newColumn[row]?.value ||
             tiles[row][col]?.id != newColumn[row]?.id) {
           moved = true;
@@ -309,15 +330,19 @@ class GameRepositoryImpl implements GameRepository {
   /// - A boolean indicating if any tile moved.
   /// - The updated score.
   /// - A boolean indicating if any merge occurred.
-  (bool, int, bool) _moveDown(List<List<Tile?>> tiles, int score) {
+  (bool, int, bool) _moveDown(
+    List<List<Tile?>> tiles,
+    int score,
+    int boardSize,
+  ) {
     var moved = false;
     var merged = false;
     var newScore = score;
 
-    for (var col = 0; col < _boardSize; col++) {
+    for (var col = 0; col < boardSize; col++) {
       final column = <Tile>[];
 
-      for (var row = _boardSize - 1; row >= 0; row--) {
+      for (var row = boardSize - 1; row >= 0; row--) {
         if (tiles[row][col] != null) {
           column.add(tiles[row][col]!);
         }
@@ -333,13 +358,13 @@ class GameRepositoryImpl implements GameRepository {
       newScore = mergedScore;
       var newColumn = mergedColumn;
 
-      while (newColumn.length < _boardSize) {
+      while (newColumn.length < boardSize) {
         newColumn.add(null);
       }
 
       newColumn = newColumn.reversed.toList();
 
-      for (var row = 0; row < _boardSize; row++) {
+      for (var row = 0; row < boardSize; row++) {
         if (tiles[row][col]?.value != newColumn[row]?.value ||
             tiles[row][col]?.id != newColumn[row]?.id) {
           moved = true;
@@ -358,15 +383,19 @@ class GameRepositoryImpl implements GameRepository {
   /// - A boolean indicating if any tile moved.
   /// - The updated score.
   /// - A boolean indicating if any merge occurred.
-  (bool, int, bool) _moveLeft(List<List<Tile?>> tiles, int score) {
+  (bool, int, bool) _moveLeft(
+    List<List<Tile?>> tiles,
+    int score,
+    int boardSize,
+  ) {
     var moved = false;
     var merged = false;
     var newScore = score;
 
-    for (var row = 0; row < _boardSize; row++) {
+    for (var row = 0; row < boardSize; row++) {
       final currentRow = <Tile>[];
 
-      for (var col = 0; col < _boardSize; col++) {
+      for (var col = 0; col < boardSize; col++) {
         if (tiles[row][col] != null) {
           currentRow.add(tiles[row][col]!);
         }
@@ -382,11 +411,11 @@ class GameRepositoryImpl implements GameRepository {
       newScore = mergedScore;
       final newRow = mergedRow;
 
-      while (newRow.length < _boardSize) {
+      while (newRow.length < boardSize) {
         newRow.add(null);
       }
 
-      for (var col = 0; col < _boardSize; col++) {
+      for (var col = 0; col < boardSize; col++) {
         if (tiles[row][col]?.value != newRow[col]?.value ||
             tiles[row][col]?.id != newRow[col]?.id) {
           moved = true;
@@ -405,14 +434,18 @@ class GameRepositoryImpl implements GameRepository {
   /// - A boolean indicating if any tile moved.
   /// - The updated score.
   /// - A boolean indicating if any merge occurred.
-  (bool, int, bool) _moveRight(List<List<Tile?>> tiles, int score) {
+  (bool, int, bool) _moveRight(
+    List<List<Tile?>> tiles,
+    int score,
+    int boardSize,
+  ) {
     var moved = false;
     var merged = false;
     var newScore = score;
 
-    for (var row = 0; row < _boardSize; row++) {
+    for (var row = 0; row < boardSize; row++) {
       final currentRow = <Tile>[];
-      for (var col = _boardSize - 1; col >= 0; col--) {
+      for (var col = boardSize - 1; col >= 0; col--) {
         if (tiles[row][col] != null) {
           currentRow.add(tiles[row][col]!);
         }
@@ -428,13 +461,13 @@ class GameRepositoryImpl implements GameRepository {
       newScore = mergedScore;
       var newRow = mergedRow;
 
-      while (newRow.length < _boardSize) {
+      while (newRow.length < boardSize) {
         newRow.add(null);
       }
 
       newRow = newRow.reversed.toList();
 
-      for (var col = 0; col < _boardSize; col++) {
+      for (var col = 0; col < boardSize; col++) {
         if (tiles[row][col]?.value != newRow[col]?.value ||
             tiles[row][col]?.id != newRow[col]?.id) {
           moved = true;
