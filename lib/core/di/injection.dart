@@ -92,7 +92,7 @@ void _configureBlocs() {
         clearBoard: getIt(),
         getGameMode: getIt(),
         watchGameMode: getIt(),
-        adsService: getIt(),
+        adService: getIt(),
       ),
     )
     ..registerFactory(

@@ -6,7 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 /// This file defines the abstract interface for an advertising service
 /// and its concrete implementation.
 ///
-/// The `AdsService` abstract class specifies the contract for
+/// The `AdService` abstract class specifies the contract for
 /// initializing, showing interstitial, and showing rewarded ads.
 abstract class AdService {
   /// Initializes the advertising service.

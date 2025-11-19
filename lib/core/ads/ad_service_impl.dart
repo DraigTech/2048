@@ -19,7 +19,7 @@ class AdServiceImpl extends AdService {
   @override
   Future<void> loadInterstitialAd() async {
     await InterstitialAd.load(
-      adUnitId: 'ca-app-pub-5795313355924108/5085282664',
+      adUnitId: 'ca-app-pub-5795313355924108/8475423838',
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
@@ -66,7 +66,7 @@ class AdServiceImpl extends AdService {
     }
 
     final bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/9214589741',
+      adUnitId: 'ca-app-pub-5795313355924108/1709322042',
       request: const AdRequest(),
       size: size,
       listener: BannerAdListener(

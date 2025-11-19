@@ -42,18 +42,21 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     required this.clearBoard,
     required this.getGameMode,
     required this.watchGameMode,
-    required this.adsService,
+    required this.adService,
   }) : super(GameInitial()) {
     on<GameStartEvent>(_onGameStarted);
     on<GameMoveEvent>(_onGameMoved);
     on<CheckGameOverEvent>(_onCheckGameOver);
     on<NewGameEvent>(_onNewGame);
     on<SaveGameEvent>(_onSaveGame);
-    on<GameResetEvent>((event, emit) => add(NewGameEvent()));
+    on<GameResetEvent>((event, emit) {
+      adService.showInterstitialAd();
+      add(NewGameEvent());
+    });
   }
 
   /// Manages ads.
-  final AdService adsService;
+  final AdService adService;
 
   /// Audio manager for playing sound effects.
   final AudioManager audioManager;
@@ -114,8 +117,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
             .listen(
               (event) => add(NewGameEvent()),
             );
-      }
- else {
+      } else {
         add(NewGameEvent());
       }
     } on Exception catch (e) {
@@ -178,7 +180,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       final currentState = state as GameLoaded;
       final isGameOver = await checkGameOver(currentState.gameBoard);
       if (isGameOver) {
-        adsService.showInterstitialAd();
+        adService.showInterstitialAd();
         emit(
           GameLoaded(
             currentState.gameBoard,
