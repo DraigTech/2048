@@ -1,3 +1,5 @@
+import 'package:draig_2048/core/ads/ad_service.dart';
+import 'package:draig_2048/core/ads/ad_service_impl.dart';
 import 'package:draig_2048/core/audio/audio_manager.dart';
 import 'package:draig_2048/core/database/database.dart';
 import 'package:draig_2048/features/game/data/repositories/game_repository_impl.dart';
@@ -90,6 +92,7 @@ void _configureBlocs() {
         clearBoard: getIt(),
         getGameMode: getIt(),
         watchGameMode: getIt(),
+        adService: getIt(),
       ),
     )
     ..registerFactory(
@@ -103,7 +106,9 @@ void _configureBlocs() {
 }
 
 void _configureServices() {
-  getIt.registerSingleton<AudioManager>(
-    AudioManager(getAudioSettings: getIt()),
-  );
+  getIt
+    ..registerSingleton<AudioManager>(
+      AudioManager(getAudioSettings: getIt()),
+    )
+    ..registerSingleton<AdService>(AdServiceImpl());
 }

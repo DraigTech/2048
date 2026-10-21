@@ -9,6 +9,7 @@ import 'package:draig_2048/features/game/presentation/widgets/game_button_widget
 import 'package:draig_2048/features/game/presentation/widgets/game_score_widget.dart';
 import 'package:draig_2048/features/game/presentation/widgets/image_border_widget.dart';
 import 'package:draig_2048/features/game/presentation/widgets/input_handler_widget.dart';
+import 'package:draig_2048/features/game/presentation/widgets/my_ad_widget.dart';
 import 'package:draig_2048/features/settings/presentation/widgets/settings_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,36 +35,27 @@ class GameContentWidget extends StatelessWidget {
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 600;
         final gameBoardSize = isWide
-            ? min(constraints.maxWidth * 0.4, constraints.maxHeight * 0.9)
-            : min(constraints.maxHeight * 0.4, constraints.maxWidth * 0.9);
-        final logoSize = Size(
-          gameBoardSize * 0.4 + 10,
-          gameBoardSize * 0.4 + 10,
+            ? min(constraints.maxWidth * 0.4, constraints.maxHeight * 0.8)
+            : min(
+                constraints.maxHeight * 0.4,
+                constraints.maxWidth * 0.8,
+              );
+
+        final scoreSize = Size(
+          gameBoardSize * 0.25,
+          gameBoardSize * 0.25,
         );
-        final scoreSize = Size(gameBoardSize * 0.25, gameBoardSize * 0.25);
-        final buttonSize = Size(gameBoardSize * 0.25, gameBoardSize * 0.15);
+
+        final buttonSize = Size(
+          gameBoardSize * 0.25,
+          gameBoardSize * 0.15,
+        );
 
         final l10n = AppLocalizations.of(context)!;
 
-        Widget gameBoard() => InputHandlerWidget(
-          focusNode: gameBoardFocus,
-          moveUp: () => context.read<GameBloc>().add(
-            const GameMoveEvent(MoveDirection.up),
-          ),
-          moveDown: () => context.read<GameBloc>().add(
-            const GameMoveEvent(MoveDirection.down),
-          ),
-          moveLeft: () => context.read<GameBloc>().add(
-            const GameMoveEvent(MoveDirection.left),
-          ),
-          moveRight: () => context.read<GameBloc>().add(
-            const GameMoveEvent(MoveDirection.right),
-          ),
-          child: GameBoardWidget(
-            gameBoard: state.gameBoard,
-            gameBoardSize: gameBoardSize,
-            gridSize: state.boardSize,
-          ),
+        final logoSize = Size(
+          gameBoardSize * 0.4 + 10,
+          gameBoardSize * 0.4 + 10,
         );
 
         Widget appIcon() => ImageBorderWidget(
@@ -102,22 +94,43 @@ class GameContentWidget extends StatelessWidget {
           },
         );
 
+        Widget gameBoard() => InputHandlerWidget(
+          focusNode: gameBoardFocus,
+          moveUp: () => context.read<GameBloc>().add(
+            const GameMoveEvent(MoveDirection.up),
+          ),
+          moveDown: () => context.read<GameBloc>().add(
+            const GameMoveEvent(MoveDirection.down),
+          ),
+          moveLeft: () => context.read<GameBloc>().add(
+            const GameMoveEvent(MoveDirection.left),
+          ),
+          moveRight: () => context.read<GameBloc>().add(
+            const GameMoveEvent(MoveDirection.right),
+          ),
+          child: GameBoardWidget(
+            gameBoard: state.gameBoard,
+            gameBoardSize: gameBoardSize,
+            gridSize: state.boardSize,
+          ),
+        );
+
         Widget scoreWideLayout() => Column(
-          spacing: 10,
           mainAxisSize: MainAxisSize.min,
+          spacing: 10,
           children: [
             appIcon(),
             Row(
-              spacing: 10,
               mainAxisSize: MainAxisSize.min,
+              spacing: 10,
               children: [
                 gameScore(),
                 gameHighScore(),
               ],
             ),
             Row(
-              spacing: 10,
               mainAxisSize: MainAxisSize.min,
+              spacing: 10,
               children: [
                 replayButton(),
                 settingsButton(),
@@ -127,12 +140,12 @@ class GameContentWidget extends StatelessWidget {
         );
 
         Widget scoreNarrowLayout() => Row(
-          spacing: 10,
           mainAxisSize: MainAxisSize.min,
+          spacing: 10,
           children: [
             Column(
-              spacing: 10,
               mainAxisSize: MainAxisSize.min,
+              spacing: 10,
               children: [
                 gameScore(),
                 replayButton(),
@@ -140,8 +153,8 @@ class GameContentWidget extends StatelessWidget {
             ),
             appIcon(),
             Column(
-              spacing: 10,
               mainAxisSize: MainAxisSize.min,
+              spacing: 10,
               children: [
                 gameHighScore(),
                 settingsButton(),
@@ -152,22 +165,29 @@ class GameContentWidget extends StatelessWidget {
 
         if (isWide) {
           // Wide layout
-          return Row(
+          return Column(
             children: [
               Expanded(
-                flex: 3,
-                child: Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 10),
-                  child: gameBoard(),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 10),
+                        child: gameBoard(),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Center(
+                        child: scoreWideLayout(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: scoreWideLayout(),
-                ),
-              ),
+              const MyAdsWidget(),
             ],
           );
         } else {
@@ -176,8 +196,14 @@ class GameContentWidget extends StatelessWidget {
             children: [
               Expanded(
                 flex: 2,
-                child: Center(
-                  child: scoreNarrowLayout(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    scoreNarrowLayout(),
+                    const SizedBox(height: 10),
+                    const MyAdsWidget(),
+                    const SizedBox(height: 10),
+                  ],
                 ),
               ),
               Expanded(
